@@ -7,27 +7,18 @@ title: Accueil
   /* Masquer le titre "Accueil" par défaut de la page */
   h1[data-toc-skip] { display: none !important; }
 
-  /* Empêche toute barre de défilement horizontale due au débordement */
-  html, body { overflow-x: clip; }
-
-  /* Bannière pleine largeur d'écran (sort du conteneur de contenu) */
+  /* Bannière : remplit la zone de contenu (sans toucher la barre latérale) */
   .hero-opossum {
     position: relative;
-    width: 100vw;
-    left: 50%;
-    transform: translateX(-50%);   /* centré sur la fenêtre (mobile) */
-    margin-top: -3rem;             /* colle la bannière tout en haut */
-    min-height: 78vh;
+    width: 100%;
+    min-height: 72vh;
+    margin: -1.5rem 0 2rem;
+    border-radius: 10px;
+    overflow: hidden;
     background: url('{{ '/assets/img/banner.jpg' | relative_url }}') center center / cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  /* Sur grand écran, on décale d'une demi-barre latérale pour couvrir toute la largeur */
-  @media (min-width: 1200px) {
-    .hero-opossum {
-      transform: translateX(calc(-50% - var(--sidebar-width, 260px) / 2));
-    }
   }
   .hero-opossum::after {
     content: "";
@@ -44,7 +35,7 @@ title: Accueil
   .hero-inner h1 {
     margin: 0 0 1.6rem;
     color: #fff;
-    font-size: clamp(2.4rem, 8vw, 6rem);
+    font-size: clamp(2.2rem, 6vw, 5rem);
     font-weight: 800;
     letter-spacing: 0.07em;
     text-shadow: 0 3px 16px rgba(0, 0, 0, 0.65);
