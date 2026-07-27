@@ -7,63 +7,74 @@ title: Accueil
   /* Masquer le titre "Accueil" par défaut de la page */
   h1[data-toc-skip] { display: none !important; }
 
-  /* Bannière pleine largeur avec titre par-dessus */
+  /* Empêche toute barre de défilement horizontale due au débordement */
+  html, body { overflow-x: clip; }
+
+  /* Bannière pleine largeur d'écran (sort du conteneur de contenu) */
   .hero-opossum {
     position: relative;
-    width: 100%;
-    height: 62vh;
-    min-height: 300px;
-    margin: -1.5rem 0 2rem;
-    border-radius: 10px;
-    overflow: hidden;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);   /* centré sur la fenêtre (mobile) */
+    margin-top: -3rem;             /* colle la bannière tout en haut */
+    min-height: 78vh;
     background: url('{{ '/assets/img/banner.jpg' | relative_url }}') center center / cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
   }
+  /* Sur grand écran, on décale d'une demi-barre latérale pour couvrir toute la largeur */
+  @media (min-width: 1200px) {
+    .hero-opossum {
+      transform: translateX(calc(-50% - var(--sidebar-width, 260px) / 2));
+    }
+  }
   .hero-opossum::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.38);
   }
-  .hero-opossum h1 {
+  .hero-inner {
     position: relative;
     z-index: 1;
-    margin: 0;
-    color: #fff;
-    font-size: clamp(2.2rem, 7vw, 5rem);
-    font-weight: 800;
-    letter-spacing: 0.06em;
     text-align: center;
-    text-shadow: 0 3px 14px rgba(0, 0, 0, 0.6);
+    padding: 1rem;
+  }
+  .hero-inner h1 {
+    margin: 0 0 1.6rem;
+    color: #fff;
+    font-size: clamp(2.4rem, 8vw, 6rem);
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-shadow: 0 3px 16px rgba(0, 0, 0, 0.65);
   }
 
-  /* Boutons réseaux sociaux */
+  /* Boutons réseaux sociaux, posés sur l'image sous le titre */
   .social-opossum {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.25rem;
+    gap: 1rem;
     justify-content: center;
-    margin: 2.5rem 0 1rem;
   }
   .social-opossum a {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.8rem 1.7rem;
+    gap: 0.55rem;
+    padding: 0.75rem 1.6rem;
     border-radius: 999px;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: #fff !important;
     text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .social-opossum a:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
   }
-  .social-opossum i { font-size: 1.4rem; }
+  .social-opossum i { font-size: 1.35rem; }
   .social-opossum .gh { background: #24292e; }
   .social-opossum .ig {
     background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
@@ -71,14 +82,15 @@ title: Accueil
 </style>
 
 <div class="hero-opossum">
-  <h1>TEAM OPOSSUM</h1>
-</div>
-
-<div class="social-opossum">
-  <a class="gh" href="https://github.com/Les-opossums" target="_blank" rel="noopener">
-    <i class="fa-brands fa-github"></i> GitHub
-  </a>
-  <a class="ig" href="https://www.instagram.com/scrat_opossums/" target="_blank" rel="noopener">
-    <i class="fa-brands fa-instagram"></i> Instagram
-  </a>
+  <div class="hero-inner">
+    <h1>TEAM OPOSSUM</h1>
+    <div class="social-opossum">
+      <a class="gh" href="https://github.com/Les-opossums" target="_blank" rel="noopener">
+        <i class="fa-brands fa-github"></i> GitHub
+      </a>
+      <a class="ig" href="https://www.instagram.com/scrat_opossums/" target="_blank" rel="noopener">
+        <i class="fa-brands fa-instagram"></i> Instagram
+      </a>
+    </div>
+  </div>
 </div>
