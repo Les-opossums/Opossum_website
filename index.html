@@ -141,14 +141,23 @@
     .card p { color: var(--texte-doux); font-size: 0.95rem; }
     .card .lire { display: inline-block; margin-top: 0.8rem; color: var(--jaune); font-weight: 600; font-size: 0.88rem; }
 
-    /* Anciens bilans : repliés derrière un fondu, dépliables (« remonter le temps ») */
-    #bilans-old { margin-top: 1.5rem; position: relative; max-height: 130px; overflow: hidden; transition: max-height 0.7s ease; }
-    #bilans-old.open { max-height: 8000px; }
-    #bilans-old:not(.open)::after {
-      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 130px;
-      background: linear-gradient(rgba(14,15,19,0), var(--fond)); pointer-events: none;
+    /* Carrousel de bilans : 3 visibles, on fait défiler vers les plus anciens */
+    .bilans-carousel { position: relative; }
+    .bilans-track {
+      display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory;
+      scroll-behavior: smooth; padding: 2rem 0.3rem; scrollbar-width: none;
+      perspective: 1100px;                 /* profondeur 3D pour l'effet coverflow */
     }
-    .bilans-more { text-align: center; margin-top: 1.5rem; }
+    .bilans-track::-webkit-scrollbar { display: none; }
+    .bilans-track .card {
+      flex: 0 0 320px; scroll-snap-align: start;
+      transform-origin: center center;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      will-change: transform, opacity;
+    }
+    @media (max-width: 700px) { .bilans-track .card { flex: 0 0 78%; } }
+    #bilans-prev { left: -6px; } #bilans-next { right: -6px; }
+    .bilans-carousel .car-btn[hidden] { display: none; }
 
     /* ===================== FENÊTRE ARTICLE (plongeon) ================== */
     .article-modal {
@@ -266,15 +275,12 @@
       <h2 class="titre">Nos <span>bilans</span></h2>
       <p class="sous-titre">Retour sur nos compétitions et les temps forts de la saison.</p>
 
-      <!-- Les bilans sont générés automatiquement depuis la liste en bas de page.
-           Les 3 plus récents sont affichés ici, les plus anciens en dessous. -->
-      <div class="grid" id="bilans-grid"></div>
-
-      <!-- Les plus anciens, repliés derrière un fondu -->
-      <div class="grid" id="bilans-old"></div>
-
-      <div class="bilans-more" id="bilans-more" hidden>
-        <button class="btn btn-jaune" id="btn-older"><i class="fa-solid fa-clock-rotate-left"></i> Remonter le temps</button>
+      <!-- Carrousel : les bilans sont générés automatiquement depuis la liste
+           en bas de page, du plus récent au plus ancien. -->
+      <div class="bilans-carousel" id="bilans-carousel">
+        <div class="bilans-track" id="bilans-grid"></div>
+        <button class="car-btn prev" id="bilans-prev" aria-label="Bilans plus récents"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="car-btn next" id="bilans-next" aria-label="Bilans plus anciens"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
     </div>
   </section>
@@ -381,74 +387,79 @@
     slides.parentElement.addEventListener('mouseleave', () => timer = setInterval(() => goTo(index + 1), 4000));
   </script>
 
+  <!-- Rendu Markdown des articles -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+
   <!-- ==================================================================== -->
-  <!--  📝  TES BILANS / ARTICLES                                            -->
-  <!--  Pour AJOUTER un article : copie un bloc { ... } ci-dessous, colle-le -->
-  <!--  dans la liste et remplis les champs. Le tri par date, l'affichage    -->
-  <!--  des 3 récents, le fondu des anciens et la fenêtre "plongeon" sont     -->
-  <!--  100% automatiques. (date au format 'AAAA-MM-JJ')                      -->
+  <!--  BILANS / ARTICLES  (chargés automatiquement depuis le dossier bilans/) -->
+  <!--                                                                        -->
+  <!--  POUR AJOUTER UN ARTICLE, une seule chose à faire :                    -->
+  <!--   1) créer un sous-dossier dans "bilans/"  (ex. bilans/mon-article/)   -->
+  <!--   2) y mettre un fichier "article.md" et une image "cover.jpg"         -->
+  <!--  L'article apparaît tout seul, trié par date. (voir bilans/LISEZMOI)   -->
   <!-- ==================================================================== -->
   <script>
-    const BILANS = [
-
-      {
-        date: '2026-05-30',
-        titre: 'Coupe de France 2026',
-        image: 'assets/img/banner.jpg',
-        resume: "Résumé de notre participation, nos matchs et nos résultats. (Texte à remplacer.)",
-        contenu: `
-          <p>Écris ici le récit complet de la compétition : le déroulé, les moments forts, les résultats…</p>
-          <p>Tu peux mettre plusieurs paragraphes, et même une image :</p>
-          <img src="assets/img/banner.jpg" alt="" />
-        `
-      },
-
-      {
-        date: '2026-03-21',
-        titre: 'RER Nouvelle-Aquitaine',
-        image: 'assets/img/banner.jpg',
-        resume: "La Rencontre des Équipes Régionales organisée par Eirbot : un rendez-vous convivial pour se confronter et progresser entre équipes de la région. (Texte à remplacer.)",
-        contenu: `
-          <p>La RER Nouvelle-Aquitaine, organisée par Eirbot, a réuni les équipes de la région le 21 mars 2026.</p>
-          <p>(À compléter : ambiance, matchs, ce qu'on en a retiré.)</p>
-        `
-      },
-
-      {
-        date: '2026-03-01',
-        titre: 'Préparation & tests',
-        image: 'assets/img/banner.jpg',
-        resume: "Les coulisses de la conception du robot. (Texte à remplacer.)",
-        contenu: `<p>(À compléter : conception, usinage, tests, galères et réussites.)</p>`
-      }
-
-      /* ----- MODÈLE À COPIER POUR UN NOUVEL ARTICLE -----
-      ,{
-        date: '2026-06-15',
-        titre: 'Titre du bilan',
-        image: 'assets/img/mon-image.jpg',
-        resume: "Résumé court affiché sur la carte.",
-        contenu: `
-          <p>Texte détaillé de l'article, sur plusieurs paragraphes.</p>
-          <img src="assets/img/une-photo.jpg" alt="" />
-        `
-      }
-      --------------------------------------------------- */
-
-    ];
-
-    /* ----------- Rendu automatique (inutile de modifier) ------------- */
     (function () {
-      const fmt = d => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-      const items = [...BILANS].sort((a, b) => new Date(b.date) - new Date(a.date));
-      const grid = document.getElementById('bilans-grid');
-      const old = document.getElementById('bilans-old');
-      const moreBox = document.getElementById('bilans-more');
-      const btn = document.getElementById('btn-older');
-      const modal = document.getElementById('article-modal');
+      /* Si tu renommes le depot GitHub, mets a jour ces deux lignes : */
+      const GH_OWNER = 'Les-opossums';
+      const GH_REPO  = 'Opossum_website';
+      const DIR = 'bilans';
 
+      const grid  = document.getElementById('bilans-grid');
+      const prev  = document.getElementById('bilans-prev');
+      const next  = document.getElementById('bilans-next');
+      const modal = document.getElementById('article-modal');
+      const fmt = d => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      /* --- Lister les dossiers d'articles --- */
+      async function listSlugs() {
+        try {                                   /* via l'API GitHub : rien a maintenir, on ajoute juste un dossier */
+          const r = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${DIR}`);
+          if (r.ok) {
+            const dirs = (await r.json()).filter(x => x.type === 'dir').map(x => x.name);
+            if (dirs.length) return dirs;
+          }
+        } catch (e) { /* ignore */ }
+        try {                                   /* secours : fichier bilans/liste.json */
+          const r = await fetch(`${DIR}/liste.json`);
+          if (r.ok) return await r.json();
+        } catch (e) { /* ignore */ }
+        return [];
+      }
+
+      /* --- Lire un article Markdown (en-tete --- ... --- puis texte) --- */
+      function parseArticle(md, slug) {
+        let meta = {}, body = md;
+        const m = md.match(/^\s*---\s*\r?\n([\s\S]*?)\r?\n---\s*\r?\n?([\s\S]*)$/);
+        if (m) {
+          m[1].split(/\r?\n/).forEach(line => {
+            const i = line.indexOf(':');
+            if (i > -1) meta[line.slice(0, i).trim().toLowerCase()] = line.slice(i + 1).trim();
+          });
+          body = m[2];
+        }
+        let html = window.marked ? marked.parse(body) : body;
+        html = html.replace(/(<img[^>]+src=")(?!https?:|\/)([^"]+)"/g, `$1${DIR}/${slug}/$2"`);
+        return {
+          slug,
+          titre:  meta.titre  || slug,
+          date:   meta.date   || '2000-01-01',
+          resume: meta.resume || '',
+          image:  `${DIR}/${slug}/cover.jpg`,
+          contenu: html
+        };
+      }
+      async function loadArticle(slug) {
+        const r = await fetch(`${DIR}/${slug}/article.md`, { cache: 'no-cache' });
+        if (!r.ok) throw new Error('404 ' + slug);
+        return parseArticle(await r.text(), slug);
+      }
+
+      /* --- Fenetre plongeon --- */
       function openArticle(a) {
-        document.getElementById('art-img').src = a.image;
+        const img = document.getElementById('art-img');
+        img.onerror = () => { img.onerror = null; img.src = 'assets/img/banner.jpg'; };
+        img.src = a.image;
         document.getElementById('art-date').textContent = fmt(a.date);
         document.getElementById('art-titre').textContent = a.titre;
         document.getElementById('art-corps').innerHTML = a.contenu;
@@ -460,12 +471,15 @@
         modal.classList.remove('open');
         document.body.classList.remove('no-scroll');
       }
+      modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeArticle));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArticle(); });
 
+      /* --- Carte --- */
       function makeCard(a) {
         const el = document.createElement('article');
         el.className = 'card';
         el.innerHTML = `
-          <img src="${a.image}" alt="" />
+          <img src="${a.image}" alt="" onerror="this.onerror=null;this.src='assets/img/banner.jpg'" />
           <div class="body">
             <div class="date">${fmt(a.date)}</div>
             <h3>${a.titre}</h3>
@@ -476,24 +490,59 @@
         return el;
       }
 
-      items.slice(0, 3).forEach(a => grid.appendChild(makeCard(a)));
-      items.slice(3).forEach(a => old.appendChild(makeCard(a)));
-
-      if (items.length > 3) {
-        moreBox.hidden = false;
-        btn.addEventListener('click', () => {
-          const open = old.classList.toggle('open');
-          btn.innerHTML = open
-            ? '<i class="fa-solid fa-chevron-up"></i> Réduire'
-            : '<i class="fa-solid fa-clock-rotate-left"></i> Remonter le temps';
-        });
-      } else {
-        old.style.display = 'none';
+      /* --- Fleches --- */
+      function cardStep() {
+        const c = grid.querySelector('.card');
+        return c ? c.getBoundingClientRect().width + 24 : 340;
+      }
+      prev.addEventListener('click', () => grid.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
+      next.addEventListener('click', () => grid.scrollBy({ left:  cardStep(), behavior: 'smooth' }));
+      function updateArrows() {
+        const max = grid.scrollWidth - grid.clientWidth - 2;
+        prev.hidden = grid.scrollLeft <= 2;
+        next.hidden = grid.scrollLeft >= max;
       }
 
-      modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeArticle));
-      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArticle(); });
+      /* --- Coverflow : zone centrale plate (les 3 cartes de devant restent
+             droites), l'effet 3D ne s'applique qu'aux cartes des bords --- */
+      const DEAD = 0.5;   /* largeur de la zone centrale sans effet (0 = partout, 1 = jamais) */
+      function coverflow() {
+        const box = grid.getBoundingClientRect();
+        const center = box.left + box.width / 2;
+        grid.querySelectorAll('.card').forEach(card => {
+          const cr = card.getBoundingClientRect();
+          let t = (cr.left + cr.width / 2 - center) / box.width;
+          t = Math.max(-1, Math.min(1, t * 1.8));
+          const s = Math.sign(t);
+          let e = (Math.abs(t) - DEAD) / (1 - DEAD);   /* 0 au centre, 1 sur les bords */
+          e = Math.max(0, Math.min(1, e));
+          if (e <= 0.001) { card.style.transform = ''; card.style.opacity = ''; card.style.zIndex = ''; return; }
+          const rotY = s * e * 45;
+          const tz = -e * 180;
+          const tx = s * e * 30;
+          const scale = 1 - e * 0.14;
+          const opacity = 1 - e * 0.78;
+          card.style.transform = `translateX(${tx}px) translateZ(${tz}px) rotateY(${rotY}deg) scale(${scale})`;
+          card.style.opacity = opacity.toFixed(3);
+          card.style.zIndex = String(100 - Math.round(e * 100));
+        });
+      }
+      function refresh() { updateArrows(); coverflow(); }
+      grid.addEventListener('scroll', refresh);
+      window.addEventListener('resize', refresh);
+      window.addEventListener('load', refresh);
+
+      /* --- Demarrage --- */
+      (async function init() {
+        const slugs = await listSlugs();
+        const results = await Promise.allSettled(slugs.map(loadArticle));
+        const items = results.filter(r => r.status === 'fulfilled').map(r => r.value)
+                             .sort((a, b) => new Date(b.date) - new Date(a.date));
+        items.forEach(a => grid.appendChild(makeCard(a)));
+        refresh();
+      })();
     })();
   </script>
+
 </body>
 </html>
