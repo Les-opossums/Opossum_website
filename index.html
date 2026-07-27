@@ -144,6 +144,9 @@
     .videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
     .video-embed { position: relative; padding-top: 56.25%; border-radius: var(--radius); overflow: hidden; background: #000; }
     .video-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .videos figure { margin: 0; }
+    .videos figcaption { margin-top: 0.8rem; text-align: center; font-weight: 600; color: var(--texte); }
+    .videos figcaption span { display: block; color: var(--texte-doux); font-weight: 400; font-size: 0.9rem; }
 
     /* =========================== SPONSORS ============================== */
     #sponsors { background: var(--fond-2); }
@@ -239,9 +242,9 @@
         <article class="card">
           <img src="assets/img/banner.jpg" alt="" />
           <div class="body">
-            <div class="date">Avril 2026</div>
-            <h3>Coupe de Belgique</h3>
-            <p>Un week-end intense à l'international. (Texte à remplacer.)</p>
+            <div class="date">21 mars 2026</div>
+            <h3>RER Nouvelle-Aquitaine</h3>
+            <p>La Rencontre des Équipes Régionales organisée par Eirbot : un rendez-vous convivial pour se confronter et progresser entre équipes de la région. (Texte à remplacer.)</p>
           </div>
         </article>
         <article class="card">
@@ -260,13 +263,19 @@
   <section id="videos">
     <div class="wrap">
       <h2 class="titre">Nos <span>matchs</span> en vidéo</h2>
-      <p class="sous-titre">Remplace les identifiants de vidéo par les tiens (voir commentaire dans le code).</p>
+      <p class="sous-titre">Quelques temps forts de nos matchs en compétition.</p>
 
-      <!-- Pour intégrer une vidéo YouTube : remplace VIDEO_ID par l'identifiant
-           de la vidéo (la partie après "v=" dans l'URL YouTube) -->
+      <!-- Pour intégrer une vidéo YouTube : remplace l'identifiant après /embed/
+           par celui de ta vidéo (la partie après "v=" dans l'URL YouTube) -->
       <div class="videos">
-        <div class="video-embed"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Match 1" allowfullscreen loading="lazy"></iframe></div>
-        <div class="video-embed"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Match 2" allowfullscreen loading="lazy"></iframe></div>
+        <figure>
+          <div class="video-embed"><iframe src="https://www.youtube.com/embed/pMh3wY4uUH4" title="Série 5 — Opossum vs TDS-TEAM72" allowfullscreen loading="lazy"></iframe></div>
+          <figcaption>Série 5 vs TDS-TEAM72<span>Match de poule</span></figcaption>
+        </figure>
+        <figure>
+          <div class="video-embed"><iframe src="https://www.youtube.com/embed/gtVpHhMgYpY" title="8e de finale — Opossum vs Sudriabotik" allowfullscreen loading="lazy"></iframe></div>
+          <figcaption>8ᵉ de finale vs Sudriabotik<span>Phase finale</span></figcaption>
+        </figure>
       </div>
     </div>
   </section>
