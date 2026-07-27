@@ -1,7 +1,7 @@
 ---
 titre: Coupe de France 2026
 date: 2026-05-30
-resume: Résumé de notre participation, nos matchs et nos résultats. (Texte à remplacer.)
+resume: Premier accès aux phases finales pour l'équipe !! 
 ---
 Écris ici le récit complet de la compétition : le déroulé, les moments forts, les résultats…
 
