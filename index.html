@@ -130,7 +130,7 @@
     /* ========================= CARTES BILANS =========================== */
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
     .card {
-      background: var(--fond-2); border-radius: var(--radius); overflow: hidden;
+      background: var(--fond-2); border-radius: var(--radius); overflow: hidden; cursor: pointer;
       border: 1px solid rgba(255,255,255,0.06); transition: transform 0.2s, border-color 0.2s;
     }
     .card:hover { transform: translateY(-5px); border-color: var(--jaune); }
@@ -139,6 +139,43 @@
     .card .date { color: var(--jaune); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
     .card h3 { margin: 0.4rem 0 0.6rem; font-size: 1.2rem; }
     .card p { color: var(--texte-doux); font-size: 0.95rem; }
+    .card .lire { display: inline-block; margin-top: 0.8rem; color: var(--jaune); font-weight: 600; font-size: 0.88rem; }
+
+    /* Anciens bilans : repliés derrière un fondu, dépliables (« remonter le temps ») */
+    #bilans-old { margin-top: 1.5rem; position: relative; max-height: 130px; overflow: hidden; transition: max-height 0.7s ease; }
+    #bilans-old.open { max-height: 8000px; }
+    #bilans-old:not(.open)::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 130px;
+      background: linear-gradient(rgba(14,15,19,0), var(--fond)); pointer-events: none;
+    }
+    .bilans-more { text-align: center; margin-top: 1.5rem; }
+
+    /* ===================== FENÊTRE ARTICLE (plongeon) ================== */
+    .article-modal {
+      position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-start; justify-content: center;
+      padding: 4vh 1rem; overflow-y: auto; opacity: 0; visibility: hidden; transition: opacity 0.3s;
+    }
+    .article-modal.open { opacity: 1; visibility: visible; }
+    .article-backdrop { position: fixed; inset: 0; background: rgba(4,5,8,0.8); backdrop-filter: blur(4px); }
+    .article-box {
+      position: relative; width: min(760px, 100%); background: var(--fond-2); border-radius: 18px;
+      overflow: hidden; border: 1px solid rgba(255,255,255,0.08);
+      transform: scale(0.6) translateY(-40px); opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.2,0.8,0.2,1.15), opacity 0.35s;
+    }
+    .article-modal.open .article-box { transform: scale(1) translateY(0); opacity: 1; }
+    .article-box > img { width: 100%; height: 300px; object-fit: cover; }
+    .article-content { padding: 1.6rem 1.8rem 2.2rem; }
+    .article-content .date { color: var(--jaune); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; }
+    .article-content h2 { font-size: 1.8rem; margin: 0.4rem 0 1rem; }
+    .article-content p { color: #d6d9e0; margin-bottom: 1rem; }
+    .article-content img { border-radius: 10px; margin: 1rem 0; }
+    .article-close {
+      position: absolute; top: 12px; right: 12px; z-index: 2; width: 42px; height: 42px; border-radius: 50%;
+      border: none; cursor: pointer; font-size: 1.2rem; background: rgba(0,0,0,0.55); color: #fff;
+    }
+    .article-close:hover { background: var(--jaune); color: #000; }
+    body.no-scroll { overflow: hidden; }
 
     /* ============================ VIDÉOS =============================== */
     .videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
@@ -229,35 +266,32 @@
       <h2 class="titre">Nos <span>bilans</span></h2>
       <p class="sous-titre">Retour sur nos compétitions et les temps forts de la saison.</p>
 
-      <!-- Pour ajouter un bilan : copie un bloc .card ci-dessous -->
-      <div class="grid">
-        <article class="card">
-          <img src="assets/img/banner.jpg" alt="" />
-          <div class="body">
-            <div class="date">Mai 2026</div>
-            <h3>Coupe de France 2026</h3>
-            <p>Résumé de notre participation, nos matchs et nos résultats. (Texte à remplacer.)</p>
-          </div>
-        </article>
-        <article class="card">
-          <img src="assets/img/banner.jpg" alt="" />
-          <div class="body">
-            <div class="date">21 mars 2026</div>
-            <h3>RER Nouvelle-Aquitaine</h3>
-            <p>La Rencontre des Équipes Régionales organisée par Eirbot : un rendez-vous convivial pour se confronter et progresser entre équipes de la région. (Texte à remplacer.)</p>
-          </div>
-        </article>
-        <article class="card">
-          <img src="assets/img/banner.jpg" alt="" />
-          <div class="body">
-            <div class="date">Mars 2026</div>
-            <h3>Préparation & tests</h3>
-            <p>Les coulisses de la conception du robot. (Texte à remplacer.)</p>
-          </div>
-        </article>
+      <!-- Les bilans sont générés automatiquement depuis la liste en bas de page.
+           Les 3 plus récents sont affichés ici, les plus anciens en dessous. -->
+      <div class="grid" id="bilans-grid"></div>
+
+      <!-- Les plus anciens, repliés derrière un fondu -->
+      <div class="grid" id="bilans-old"></div>
+
+      <div class="bilans-more" id="bilans-more" hidden>
+        <button class="btn btn-jaune" id="btn-older"><i class="fa-solid fa-clock-rotate-left"></i> Remonter le temps</button>
       </div>
     </div>
   </section>
+
+  <!-- Fenêtre article (effet plongeon) -->
+  <div class="article-modal" id="article-modal" aria-hidden="true">
+    <div class="article-backdrop" data-close></div>
+    <article class="article-box" role="dialog" aria-modal="true" aria-label="Article">
+      <button class="article-close" data-close aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+      <img id="art-img" src="" alt="" />
+      <div class="article-content">
+        <div class="date" id="art-date"></div>
+        <h2 id="art-titre"></h2>
+        <div id="art-corps"></div>
+      </div>
+    </article>
+  </div>
 
   <!-- ============================== VIDÉOS ============================= -->
   <section id="videos">
@@ -345,6 +379,121 @@
     let timer = setInterval(() => goTo(index + 1), 4000); /* défilement auto toutes les 4s */
     slides.parentElement.addEventListener('mouseenter', () => clearInterval(timer));
     slides.parentElement.addEventListener('mouseleave', () => timer = setInterval(() => goTo(index + 1), 4000));
+  </script>
+
+  <!-- ==================================================================== -->
+  <!--  📝  TES BILANS / ARTICLES                                            -->
+  <!--  Pour AJOUTER un article : copie un bloc { ... } ci-dessous, colle-le -->
+  <!--  dans la liste et remplis les champs. Le tri par date, l'affichage    -->
+  <!--  des 3 récents, le fondu des anciens et la fenêtre "plongeon" sont     -->
+  <!--  100% automatiques. (date au format 'AAAA-MM-JJ')                      -->
+  <!-- ==================================================================== -->
+  <script>
+    const BILANS = [
+
+      {
+        date: '2026-05-30',
+        titre: 'Coupe de France 2026',
+        image: 'assets/img/banner.jpg',
+        resume: "Résumé de notre participation, nos matchs et nos résultats. (Texte à remplacer.)",
+        contenu: `
+          <p>Écris ici le récit complet de la compétition : le déroulé, les moments forts, les résultats…</p>
+          <p>Tu peux mettre plusieurs paragraphes, et même une image :</p>
+          <img src="assets/img/banner.jpg" alt="" />
+        `
+      },
+
+      {
+        date: '2026-03-21',
+        titre: 'RER Nouvelle-Aquitaine',
+        image: 'assets/img/banner.jpg',
+        resume: "La Rencontre des Équipes Régionales organisée par Eirbot : un rendez-vous convivial pour se confronter et progresser entre équipes de la région. (Texte à remplacer.)",
+        contenu: `
+          <p>La RER Nouvelle-Aquitaine, organisée par Eirbot, a réuni les équipes de la région le 21 mars 2026.</p>
+          <p>(À compléter : ambiance, matchs, ce qu'on en a retiré.)</p>
+        `
+      },
+
+      {
+        date: '2026-03-01',
+        titre: 'Préparation & tests',
+        image: 'assets/img/banner.jpg',
+        resume: "Les coulisses de la conception du robot. (Texte à remplacer.)",
+        contenu: `<p>(À compléter : conception, usinage, tests, galères et réussites.)</p>`
+      }
+
+      /* ----- MODÈLE À COPIER POUR UN NOUVEL ARTICLE -----
+      ,{
+        date: '2026-06-15',
+        titre: 'Titre du bilan',
+        image: 'assets/img/mon-image.jpg',
+        resume: "Résumé court affiché sur la carte.",
+        contenu: `
+          <p>Texte détaillé de l'article, sur plusieurs paragraphes.</p>
+          <img src="assets/img/une-photo.jpg" alt="" />
+        `
+      }
+      --------------------------------------------------- */
+
+    ];
+
+    /* ----------- Rendu automatique (inutile de modifier) ------------- */
+    (function () {
+      const fmt = d => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      const items = [...BILANS].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const grid = document.getElementById('bilans-grid');
+      const old = document.getElementById('bilans-old');
+      const moreBox = document.getElementById('bilans-more');
+      const btn = document.getElementById('btn-older');
+      const modal = document.getElementById('article-modal');
+
+      function openArticle(a) {
+        document.getElementById('art-img').src = a.image;
+        document.getElementById('art-date').textContent = fmt(a.date);
+        document.getElementById('art-titre').textContent = a.titre;
+        document.getElementById('art-corps').innerHTML = a.contenu;
+        modal.classList.add('open');
+        document.body.classList.add('no-scroll');
+        modal.scrollTop = 0;
+      }
+      function closeArticle() {
+        modal.classList.remove('open');
+        document.body.classList.remove('no-scroll');
+      }
+
+      function makeCard(a) {
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.innerHTML = `
+          <img src="${a.image}" alt="" />
+          <div class="body">
+            <div class="date">${fmt(a.date)}</div>
+            <h3>${a.titre}</h3>
+            <p>${a.resume}</p>
+            <span class="lire">Lire l'article <i class="fa-solid fa-arrow-right"></i></span>
+          </div>`;
+        el.addEventListener('click', () => openArticle(a));
+        return el;
+      }
+
+      items.slice(0, 3).forEach(a => grid.appendChild(makeCard(a)));
+      items.slice(3).forEach(a => old.appendChild(makeCard(a)));
+
+      if (items.length > 3) {
+        moreBox.hidden = false;
+        btn.addEventListener('click', () => {
+          const open = old.classList.toggle('open');
+          btn.innerHTML = open
+            ? '<i class="fa-solid fa-chevron-up"></i> Réduire'
+            : '<i class="fa-solid fa-clock-rotate-left"></i> Remonter le temps';
+        });
+      } else {
+        old.style.display = 'none';
+      }
+
+      modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeArticle));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArticle(); });
+    })();
   </script>
 </body>
 </html>
