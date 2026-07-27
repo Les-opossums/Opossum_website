@@ -106,6 +106,7 @@
     .btn-jaune { background: var(--jaune); color: #17130a; }
     .btn-gh { background: #24292e; color: #fff; }
     .btn-ig { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: #fff; }
+    .btn-li { background: #0a66c2; color: #fff; }
     .scroll-down {
       position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%);
       color: #fff; font-size: 1.5rem; opacity: 0.8; animation: bob 1.6s infinite;
@@ -144,6 +145,7 @@
     /* Carrousel de bilans : 3 visibles, on fait défiler vers les plus anciens */
     .bilans-carousel { position: relative; }
     .bilans-track {
+      position: relative;
       display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory;
       scroll-behavior: smooth; padding: 2rem 0.3rem; scrollbar-width: none;
       perspective: 1100px;                 /* profondeur 3D pour l'effet coverflow */
@@ -245,6 +247,7 @@
     <div class="cta">
       <a class="btn btn-gh" href="https://github.com/Les-opossums" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> GitHub</a>
       <a class="btn btn-ig" href="https://www.instagram.com/scrat_opossums/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> Instagram</a>
+      <a class="btn btn-li" href="https://www.linkedin.com/company/team-opossum-robotique/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</a>
     </div>
     <a href="#robots" class="scroll-down" aria-label="Défiler"><i class="fa-solid fa-chevron-down"></i></a>
   </section>
@@ -255,13 +258,10 @@
       <h2 class="titre">Nos <span>robots</span></h2>
       <p class="sous-titre">Découvrez les machines conçues, fabriquées et programmées par l'équipe.</p>
 
-      <!-- CARROUSEL : ajoute/enlève des <img> ci-dessous (dans assets/img/) -->
+      <!-- CARROUSEL : les photos sont chargées automatiquement depuis le dossier
+           ROBOT_PICTURE/. Pour en ajouter, dépose simplement tes images dedans. -->
       <div class="carousel">
-        <div class="slides" id="slides">
-          <img src="assets/img/banner.jpg" alt="Robot Opossum 1" />
-          <img src="assets/img/banner.jpg" alt="Robot Opossum 2" />
-          <img src="assets/img/banner.jpg" alt="Robot Opossum 3" />
-        </div>
+        <div class="slides" id="slides"></div>
         <button class="car-btn prev" id="prev" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
         <button class="car-btn next" id="next" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
@@ -347,6 +347,7 @@
     <div class="socials">
       <a href="https://github.com/Les-opossums" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
       <a href="https://www.instagram.com/scrat_opossums/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="https://www.linkedin.com/company/team-opossum-robotique/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
       <a href="mailto:contact@exemple.fr" aria-label="E-mail"><i class="fa-solid fa-envelope"></i></a>
     </div>
     <small>© 2026 Team Opossum — Équipe de robotique.</small>
@@ -359,32 +360,61 @@
     burger.addEventListener('click', () => menu.classList.toggle('open'));
     menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.classList.remove('open')));
 
-    /* --------- Carrousel automatique --------- */
-    const slides = document.getElementById('slides');
-    const dotsBox = document.getElementById('dots');
-    const total = slides.children.length;
-    let index = 0;
+    /* --------- Carrousel « Nos robots » : photos chargées depuis ROBOT_PICTURE/ --------- */
+    (function () {
+      /* Si tu renommes le dépôt GitHub, mets à jour ces deux lignes : */
+      const GH_OWNER = 'Les-opossums', GH_REPO = 'Opossum_website', DIR = 'ROBOT_PICTURE';
+      const slides = document.getElementById('slides');
+      const dotsBox = document.getElementById('dots');
+      const prevBtn = document.getElementById('prev');
+      const nextBtn = document.getElementById('next');
+      const isImg = n => /\.(jpe?g|png|webp|gif|avif)$/i.test(n);
 
-    for (let i = 0; i < total; i++) {
-      const b = document.createElement('button');
-      if (i === 0) b.classList.add('active');
-      b.addEventListener('click', () => goTo(i));
-      dotsBox.appendChild(b);
-    }
-    const dots = dotsBox.children;
+      async function listImages() {
+        try {                                   /* via l'API GitHub : il suffit de déposer des images dans le dossier */
+          const r = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${DIR}`);
+          if (r.ok) {
+            const files = (await r.json()).filter(x => x.type === 'file' && isImg(x.name)).map(x => x.name).sort();
+            if (files.length) return files.map(n => `${DIR}/${n}`);
+          }
+        } catch (e) { /* ignore */ }
+        try {                                   /* secours : ROBOT_PICTURE/liste.json */
+          const r = await fetch(`${DIR}/liste.json`);
+          if (r.ok) { const a = await r.json(); if (a.length) return a.map(n => `${DIR}/${n}`); }
+        } catch (e) { /* ignore */ }
+        return ['assets/img/banner.jpg'];        /* dernier recours : la bannière */
+      }
 
-    function goTo(i) {
-      index = (i + total) % total;
-      slides.style.transform = `translateX(-${index * 100}%)`;
-      for (const d of dots) d.classList.remove('active');
-      dots[index].classList.add('active');
-    }
-    document.getElementById('next').addEventListener('click', () => goTo(index + 1));
-    document.getElementById('prev').addEventListener('click', () => goTo(index - 1));
+      function initCarousel() {
+        const total = slides.children.length;
+        let index = 0;
+        for (let i = 0; i < total; i++) {
+          const b = document.createElement('button');
+          if (i === 0) b.classList.add('active');
+          b.addEventListener('click', () => goTo(i));
+          dotsBox.appendChild(b);
+        }
+        const dots = dotsBox.children;
+        function goTo(i) {
+          index = (i + total) % total;
+          slides.style.transform = `translateX(-${index * 100}%)`;
+          for (const d of dots) d.classList.remove('active');
+          if (dots[index]) dots[index].classList.add('active');
+        }
+        nextBtn.addEventListener('click', () => goTo(index + 1));
+        prevBtn.addEventListener('click', () => goTo(index - 1));
+        if (total <= 1) { prevBtn.style.display = nextBtn.style.display = 'none'; return; }
+        let timer = setInterval(() => goTo(index + 1), 4000); /* défilement auto toutes les 4s */
+        slides.parentElement.addEventListener('mouseenter', () => clearInterval(timer));
+        slides.parentElement.addEventListener('mouseleave', () => timer = setInterval(() => goTo(index + 1), 4000));
+      }
 
-    let timer = setInterval(() => goTo(index + 1), 4000); /* défilement auto toutes les 4s */
-    slides.parentElement.addEventListener('mouseenter', () => clearInterval(timer));
-    slides.parentElement.addEventListener('mouseleave', () => timer = setInterval(() => goTo(index + 1), 4000));
+      (async function () {
+        const imgs = await listImages();
+        slides.innerHTML = imgs.map((src, i) => `<img src="${src}" alt="Robot Opossum ${i + 1}" loading="lazy" />`).join('');
+        initCarousel();
+      })();
+    })();
   </script>
 
   <!-- Rendu Markdown des articles -->
@@ -503,25 +533,27 @@
         next.hidden = grid.scrollLeft >= max;
       }
 
-      /* --- Coverflow : zone centrale plate (les 3 cartes de devant restent
-             droites), l'effet 3D ne s'applique qu'aux cartes des bords --- */
-      const DEAD = 0.5;   /* largeur de la zone centrale sans effet (0 = partout, 1 = jamais) */
+      /* --- Effet 3D : seulement sur les cartes coupées par un bord (celles
+             qui sortent du cadre). Une carte entièrement visible reste droite.
+             On mesure la position de mise en page (offsetLeft), donc l'effet
+             lui-même ne fausse pas la mesure. --- */
       function coverflow() {
-        const box = grid.getBoundingClientRect();
-        const center = box.left + box.width / 2;
+        const viewLeft = grid.scrollLeft;
+        const viewRight = viewLeft + grid.clientWidth;
         grid.querySelectorAll('.card').forEach(card => {
-          const cr = card.getBoundingClientRect();
-          let t = (cr.left + cr.width / 2 - center) / box.width;
-          t = Math.max(-1, Math.min(1, t * 1.8));
-          const s = Math.sign(t);
-          let e = (Math.abs(t) - DEAD) / (1 - DEAD);   /* 0 au centre, 1 sur les bords */
-          e = Math.max(0, Math.min(1, e));
-          if (e <= 0.001) { card.style.transform = ''; card.style.opacity = ''; card.style.zIndex = ''; return; }
+          const cl = card.offsetLeft, cw = card.offsetWidth, crr = cl + cw;
+          const leftCut = Math.max(0, viewLeft - cl);      /* portion cachée à gauche */
+          const rightCut = Math.max(0, crr - viewRight);   /* portion cachée à droite */
+          let e = 0, s = 0;
+          if (leftCut >= rightCut && leftCut > 0) { e = leftCut / cw; s = -1; }   /* recule vers l'arrière-gauche */
+          else if (rightCut > 0) { e = rightCut / cw; s = 1; }                    /* recule vers l'arrière-droite */
+          e = Math.min(1, e * 1.3);
+          if (e <= 0.02) { card.style.transform = ''; card.style.opacity = ''; card.style.zIndex = ''; return; }
           const rotY = s * e * 45;
           const tz = -e * 180;
-          const tx = s * e * 30;
+          const tx = s * e * 22;
           const scale = 1 - e * 0.14;
-          const opacity = 1 - e * 0.78;
+          const opacity = 1 - e * 0.8;
           card.style.transform = `translateX(${tx}px) translateZ(${tz}px) rotateY(${rotY}deg) scale(${scale})`;
           card.style.opacity = opacity.toFixed(3);
           card.style.zIndex = String(100 - Math.round(e * 100));
