@@ -7,18 +7,29 @@ title: Accueil
   /* Masquer le titre "Accueil" par défaut de la page */
   h1[data-toc-skip] { display: none !important; }
 
-  /* Bannière : remplit la zone de contenu (sans toucher la barre latérale) */
+  /* Élargir la zone de contenu POUR CETTE PAGE : la colonne prend toute la
+     place à droite de la barre latérale (on retire la largeur max de Chirpy) */
+  #main-wrapper .container { max-width: none !important; }
+  #main-wrapper main {
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+  /* On supprime le padding du contenu autour de la bannière pour qu'elle touche
+     les bords de la zone (haut, gauche, droite) */
+  #main-wrapper main { overflow-x: clip; }
+
   .hero-opossum {
     position: relative;
-    width: 100%;
-    min-height: 72vh;
-    margin: -1.5rem 0 2rem;
-    border-radius: 10px;
+    margin: -1.5rem -1.6rem 2rem;   /* annule le padding du contenu -> touche les bords */
+    min-height: 84vh;
     overflow: hidden;
     background: url('{{ '/assets/img/banner.jpg' | relative_url }}') center center / cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  @media (min-width: 1400px) {
+    .hero-opossum { margin-left: -3rem; margin-right: -3rem; }
   }
   .hero-opossum::after {
     content: "";
