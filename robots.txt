@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://les-opossums.github.io/Opossum_website/sitemap.xml
