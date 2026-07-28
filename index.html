@@ -105,6 +105,7 @@
     nav.menu { display: flex; gap: 1.6rem; align-items: center; }
     nav.menu a { color: var(--texte-doux); font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
     nav.menu a:hover { color: var(--jaune); }
+    nav.menu a.active { color: var(--jaune); font-weight: 600; }
     .burger { display: none; font-size: 1.5rem; background: none; border: none; color: var(--texte); cursor: pointer; }
 
     @media (max-width: 800px) {
@@ -405,7 +406,7 @@
       <div class="sponsor-cta">
         <h3>Envie de nous soutenir ?</h3>
         <p>Matériel, financement, savoir-faire : chaque coup de main compte. Rejoignez l'aventure Opossum et gagnez en visibilité auprès de la communauté robotique.</p>
-        <a class="btn btn-jaune" href="mailto:contact@exemple.fr"><i class="fa-solid fa-handshake"></i> Devenir sponsor</a>
+        <a class="btn btn-jaune" href="mailto:scrat.opossum@gmail.com"><i class="fa-solid fa-handshake"></i> Devenir sponsor</a>
       </div>
     </div>
   </section>
@@ -416,7 +417,7 @@
       <a href="https://github.com/Les-opossums" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
       <a href="https://www.instagram.com/scrat_opossums/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
       <a href="https://www.linkedin.com/company/team-opossum-robotique/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-      <a href="mailto:contact@exemple.fr" aria-label="E-mail"><i class="fa-solid fa-envelope"></i></a>
+      <a href="mailto:scrat.opossum@gmail.com" aria-label="E-mail"><i class="fa-solid fa-envelope"></i></a>
     </div>
     <small>© 2026 Team Opossum — Équipe de robotique.</small>
   </footer>
@@ -442,6 +443,22 @@
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
       }, { threshold: 0.12 });
       els.forEach(el => io.observe(el));
+    })();
+
+    /* --------- Surlignage du lien de menu de la section active --------- */
+    (function () {
+      const links = [...document.querySelectorAll('nav.menu a')];
+      const secs = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+      if (!('IntersectionObserver' in window) || !secs.length) return;
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            const id = '#' + e.target.id;
+            links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === id));
+          }
+        });
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+      secs.forEach(s => io.observe(s));
     })();
 
     /* --------- Carrousel « Nos robots » : photos chargées depuis ROBOT_PICTURE/ --------- */
