@@ -69,8 +69,13 @@
       background: var(--fond-2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius);
       padding: 1.2rem 1.6rem; text-align: center; min-width: 170px;
     }
-    .apropos-stats .stat span { display: block; font-size: 1.3rem; font-weight: 800; color: var(--jaune); }
+    .apropos-stats .stat span { display: block; font-size: 2rem; font-weight: 800; color: var(--jaune); }
     .apropos-stats .stat small { color: var(--texte-doux); font-size: 0.85rem; }
+
+    /* Apparition au défilement (les éléments montent en fondu) */
+    .reveal { opacity: 0; transform: translateY(42px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+    .reveal.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
     h2.titre {
       font-size: clamp(1.8rem, 4vw, 2.6rem);
       font-weight: 800;
@@ -304,13 +309,11 @@
       <div class="apropos-txt">
         <p>Fondée en <strong>2025</strong>, l'association <strong>Team Opossum</strong> réunit des passionnés autour d'un même objectif : concevoir, fabriquer et programmer des robots autonomes, puis les faire s'affronter sur le terrain.</p>
         <p>Notre grand rendez-vous chaque année, c'est la <strong>Coupe de France de Robotique</strong> — mais nous participons aussi à d'autres événements et rencontres autour de la robotique, pour apprendre, partager et repousser nos limites.</p>
-        <p>De la mécanique à l'électronique en passant par le code, nous touchons à tout, avec la même envie : progresser en s'amusant. Bienvenue chez les Opossums&nbsp;!</p>
       </div>
 
       <div class="apropos-stats">
-        <div class="stat"><span>2025</span><small>Création de l'association</small></div>
-        <div class="stat"><span>CFR</span><small>Coupe de France de Robotique</small></div>
-        <div class="stat"><span>Méca · Élec · Code</span><small>Nos terrains de jeu</small></div>
+        <div class="stat"><span>42ᵉ</span><small>Coupe de France 2025</small></div>
+        <div class="stat"><span>5ᵉ</span><small>Coupe de France 2026</small></div>
       </div>
     </div>
   </section>
@@ -424,6 +427,22 @@
     const menu = document.getElementById('menu');
     burger.addEventListener('click', () => menu.classList.toggle('open'));
     menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.classList.remove('open')));
+
+    /* --------- Apparition au défilement (fondu + montée) --------- */
+    (function () {
+      const sel = '.titre, .sous-titre, .apropos-txt, .apropos-stats .stat, #videos figure, .sponsor-grid a, .sponsor-cta, #robots .carousel, #robots .dots';
+      const els = document.querySelectorAll(sel);
+      els.forEach(el => el.classList.add('reveal'));
+      /* léger décalage pour les éléments d'un même groupe (tuiles, sponsors, vidéos...) */
+      document.querySelectorAll('.apropos-stats .stat, .sponsor-grid a, #videos figure').forEach((el, i) => {
+        el.style.transitionDelay = ((i % 4) * 0.08) + 's';
+      });
+      if (!('IntersectionObserver' in window)) { els.forEach(el => el.classList.add('visible')); return; }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+      }, { threshold: 0.12 });
+      els.forEach(el => io.observe(el));
+    })();
 
     /* --------- Carrousel « Nos robots » : photos chargées depuis ROBOT_PICTURE/ --------- */
     (function () {
