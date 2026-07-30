@@ -195,13 +195,13 @@
     .bilans-carousel { position: relative; }
     .bilans-track {
       position: relative;
-      display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x proximity;
-      scroll-behavior: smooth; padding: 2rem 0.3rem; scrollbar-width: none;
+      display: flex; gap: 1.5rem; overflow-x: auto; padding: 2rem 0.3rem; scrollbar-width: none;
       perspective: 1100px;                 /* profondeur 3D pour l'effet coverflow */
+      overscroll-behavior-x: contain;
     }
     .bilans-track::-webkit-scrollbar { display: none; }
     .bilans-track .card {
-      flex: 0 0 320px; scroll-snap-align: start;
+      flex: 0 0 320px;
       transform-origin: center center;
       backface-visibility: hidden;
     }
