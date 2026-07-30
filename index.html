@@ -203,7 +203,7 @@
     .bilans-track .card {
       flex: 0 0 320px; scroll-snap-align: start;
       transform-origin: center center;
-      will-change: transform, opacity;     /* effet suivi image par image (voir JS) */
+      backface-visibility: hidden;
     }
     @media (max-width: 700px) { .bilans-track .card { flex: 0 0 78%; } }
     #bilans-prev { left: -6px; } #bilans-next { right: -6px; }
@@ -663,6 +663,9 @@
         const viewRight = viewLeft + grid.clientWidth;
         grid.querySelectorAll('.card').forEach(card => {
           const cl = card.offsetLeft, cw = card.offsetWidth, crr = cl + cw;
+          /* Carte entièrement hors du cadre -> on la masque (rien à peindre) */
+          if (crr <= viewLeft - 40 || cl >= viewRight + 40) { card.style.visibility = 'hidden'; return; }
+          card.style.visibility = '';
           const leftCut = Math.max(0, viewLeft - cl);      /* portion cachée à gauche */
           const rightCut = Math.max(0, crr - viewRight);   /* portion cachée à droite */
           let e = 0, s = 0;
