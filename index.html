@@ -246,13 +246,13 @@
 
     /* =========================== SPONSORS ============================== */
     #sponsors { background: var(--fond-2); }
-    .sponsor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; align-items: center; }
+    .sponsor-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; }
     .sponsor-grid a {
-      background: #fff; border-radius: var(--radius); padding: 1.4rem; display: flex;
-      align-items: center; justify-content: center; min-height: 110px; transition: transform 0.2s;
+      background: #fff; border-radius: var(--radius); padding: 1.5rem; display: flex;
+      align-items: center; justify-content: center; width: 230px; height: 170px; transition: transform 0.2s;
     }
     .sponsor-grid a:hover { transform: scale(1.05); }
-    .sponsor-grid img { max-height: 70px; object-fit: contain; }
+    .sponsor-grid img { max-height: 120px; max-width: 90%; object-fit: contain; }
     .sponsor-cta {
       text-align: center; margin-top: 3rem; background: var(--fond);
       border: 1px dashed var(--jaune); border-radius: var(--radius); padding: 2.5rem 1.5rem;
@@ -644,7 +644,7 @@
       /* --- Fleches --- */
       function cardStep() {
         const c = grid.querySelector('.card');
-        return c ? c.getBoundingClientRect().width + 24 : 340;
+        return c ? c.offsetWidth + 24 : 340;   /* largeur réelle (non transformée) + gap */
       }
       prev.addEventListener('click', () => grid.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
       next.addEventListener('click', () => grid.scrollBy({ left:  cardStep(), behavior: 'smooth' }));
