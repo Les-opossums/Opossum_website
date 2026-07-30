@@ -129,9 +129,10 @@
       background: linear-gradient(rgba(14,15,19,0.55), rgba(14,15,19,0.75)),
                   url('assets/img/banner.jpg') center center / cover no-repeat;
     }
-    /* Sur mobile : recadre la bannière sur un des PAMI (0% = robot de gauche, 100% = robot de droite) */
+    /* Sur mobile : recadre la bannière sur le 3e robot (base « 2 »).
+       0% = robot de gauche, 100% = robot de droite — ajuste ce % si besoin. */
     @media (max-width: 700px) {
-      .hero { background-position: 34% center; }
+      .hero { background-position: 60% center; }
     }
     .hero h1 {
       font-size: clamp(2.6rem, 9vw, 6rem); font-weight: 800; letter-spacing: 0.06em;
