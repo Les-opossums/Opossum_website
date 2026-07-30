@@ -195,7 +195,7 @@
     .bilans-carousel { position: relative; }
     .bilans-track {
       position: relative;
-      display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory;
+      display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x proximity;
       scroll-behavior: smooth; padding: 2rem 0.3rem; scrollbar-width: none;
       perspective: 1100px;                 /* profondeur 3D pour l'effet coverflow */
     }
@@ -203,8 +203,7 @@
     .bilans-track .card {
       flex: 0 0 320px; scroll-snap-align: start;
       transform-origin: center center;
-      transition: transform 0.4s ease, opacity 0.4s ease;
-      will-change: transform, opacity;
+      will-change: transform, opacity;     /* effet suivi image par image (voir JS) */
     }
     @media (max-width: 700px) { .bilans-track .card { flex: 0 0 78%; } }
     #bilans-prev { left: -6px; } #bilans-next { right: -6px; }
@@ -682,7 +681,11 @@
         });
       }
       function refresh() { updateArrows(); coverflow(); }
-      grid.addEventListener('scroll', refresh);
+      /* Recalcul synchronisé avec l'affichage (fluide dans les deux sens) */
+      let ticking = false;
+      grid.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(() => { refresh(); ticking = false; }); }
+      }, { passive: true });
       window.addEventListener('resize', refresh);
       window.addEventListener('load', refresh);
 
