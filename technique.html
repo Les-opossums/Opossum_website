@@ -131,10 +131,6 @@
         alt="Modèle 3D du robot">
       </model-viewer>
       <p class="viewer-note">Glissez pour tourner autour · molette/pincement pour zoomer · cliquez sur un point jaune pour les détails</p>
-      <div style="text-align:center; margin-top:0.5rem;">
-        <button id="place-btn" style="background:var(--fond-2); color:var(--texte-doux); border:1px dashed rgba(255,255,255,0.2); border-radius:999px; padding:0.4rem 1rem; cursor:pointer; font-family:inherit; font-size:0.82rem;">📍 Mode placement des points (dev)</button>
-        <code id="place-out" style="display:inline-block; margin-left:0.6rem; color:var(--jaune); font-size:0.82rem;"></code>
-      </div>
     </div>
   </section>
 
@@ -292,28 +288,6 @@
       document.querySelectorAll('#switch button').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
       render(b.dataset.robot);
-    });
-
-    /* --- Mode placement des points : clique sur le modèle pour récupérer la position à coller dans "pos" --- */
-    const placeBtn = document.getElementById('place-btn');
-    const placeOut = document.getElementById('place-out');
-    let placeMode = false;
-    placeBtn.addEventListener('click', () => {
-      placeMode = !placeMode;
-      placeBtn.textContent = placeMode ? '📍 ACTIF — clique une pièce du robot' : '📍 Mode placement des points (dev)';
-      viewer.style.cursor = placeMode ? 'crosshair' : '';
-      placeOut.textContent = '';
-    });
-    viewer.addEventListener('click', (e) => {
-      if (!placeMode) return;
-      const p = viewer.positionAndNormalFromPoint ? viewer.positionAndNormalFromPoint(e.clientX, e.clientY) : null;
-      if (p) {
-        const s = "pos: '" + p.position.toString() + "'";
-        placeOut.textContent = s + '  (copié)';
-        if (navigator.clipboard) navigator.clipboard.writeText(s).catch(() => {});
-      } else {
-        placeOut.textContent = '(vise bien une pièce du robot)';
-      }
     });
 
     render('robot');
