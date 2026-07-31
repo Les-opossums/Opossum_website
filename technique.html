@@ -374,6 +374,12 @@
       });
     }
 
+    /* Applique l'angle de départ une fois le modèle chargé (fiable) */
+    viewer.addEventListener('load', () => {
+      const d = DATA[currentRobot];
+      if (d && d.orbit) viewer.cameraOrbit = d.orbit;
+    });
+
     /* sélecteur robot / pami */
     document.getElementById('switch').addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
