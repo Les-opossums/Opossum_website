@@ -108,6 +108,10 @@
     nav.menu a:hover { color: var(--jaune); }
     nav.menu a.active { color: var(--jaune); font-weight: 600; }
     .burger { display: none; font-size: 1.5rem; background: none; border: none; color: var(--texte); cursor: pointer; }
+    .header-right { display: flex; align-items: center; gap: 0.8rem; }
+    .lang-switch { display: inline-flex; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; overflow: hidden; }
+    .lang-switch button { background: transparent; color: var(--texte-doux); border: none; padding: 0.3rem 0.68rem; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .lang-switch button.active { background: var(--jaune); color: #17130a; }
 
     @media (max-width: 800px) {
       nav.menu {
@@ -288,22 +292,28 @@
   <header>
     <div class="logo">TEAM <span>OPOSSUM</span></div>
     <nav class="menu" id="menu">
-      <a href="#accueil">Accueil</a>
-      <a href="#apropos">À propos</a>
-      <a href="#robots">Robots</a>
-      <a href="technique.html">Technique</a>
-      <a href="#bilans">Bilans</a>
-      <a href="#videos">Vidéos</a>
-      <a href="#sponsors">Sponsors</a>
-      <a href="#contact">Contact</a>
+      <a href="#accueil" data-i18n="nav.home">Accueil</a>
+      <a href="#apropos" data-i18n="nav.about">À propos</a>
+      <a href="#robots" data-i18n="nav.robots">Robots</a>
+      <a href="technique.html" data-i18n="nav.tech">Technique</a>
+      <a href="#bilans" data-i18n="nav.reports">Bilans</a>
+      <a href="#videos" data-i18n="nav.videos">Vidéos</a>
+      <a href="#sponsors" data-i18n="nav.sponsors">Sponsors</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
     </nav>
-    <button class="burger" id="burger" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="header-right">
+      <div class="lang-switch" id="lang-switch">
+        <button type="button" data-lang="fr">FR</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <button class="burger" id="burger" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
   </header>
 
   <!-- =============================== HERO ============================== -->
   <section class="hero" id="accueil">
     <h1>TEAM OPOSSUM</h1>
-    <p>Équipe de robotique — Coupe de France de Robotique</p>
+    <p data-i18n="hero.tagline">Équipe de robotique — Coupe de France de Robotique</p>
     <div class="cta">
       <a class="btn btn-gh" href="https://github.com/Les-opossums" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> GitHub</a>
       <a class="btn btn-ig" href="https://www.instagram.com/scrat_opossums/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> Instagram</a>
@@ -315,17 +325,17 @@
   <!-- ============================== À PROPOS =========================== -->
   <section id="apropos">
     <div class="wrap">
-      <h2 class="titre">À <span>propos</span></h2>
-      <p class="sous-titre">Une jeune équipe de passionnés de robotique.</p>
+      <h2 class="titre" data-i18n="about.title">À <span>propos</span></h2>
+      <p class="sous-titre" data-i18n="about.subtitle">Une jeune équipe de passionnés de robotique.</p>
 
       <div class="apropos-txt">
-        <p>Fondée en <strong>2025</strong>, l'association <strong>Team Opossum</strong> réunit des passionnés autour d'un même objectif : concevoir, fabriquer et programmer des robots autonomes, puis les faire s'affronter sur le terrain.</p>
-        <p>Notre grand rendez-vous chaque année, c'est la <strong>Coupe de France de Robotique</strong> — mais nous participons aussi à d'autres événements et rencontres autour de la robotique, pour apprendre, partager et repousser nos limites.</p>
+        <p data-i18n="about.p1">Fondée en <strong>2025</strong>, l'association <strong>Team Opossum</strong> réunit des passionnés autour d'un même objectif : concevoir, fabriquer et programmer des robots autonomes, puis les faire s'affronter sur le terrain.</p>
+        <p data-i18n="about.p2">Notre grand rendez-vous chaque année, c'est la <strong>Coupe de France de Robotique</strong> — mais nous participons aussi à d'autres événements et rencontres autour de la robotique, pour apprendre, partager et repousser nos limites.</p>
       </div>
 
       <div class="apropos-stats">
-        <div class="stat"><span>42ᵉ</span><small>Coupe de France 2025</small></div>
-        <div class="stat"><span>5ᵉ</span><small>Coupe de France 2026</small></div>
+        <div class="stat"><span>42ᵉ</span><small data-i18n="about.stat1">Coupe de France 2025</small></div>
+        <div class="stat"><span>5ᵉ</span><small data-i18n="about.stat2">Coupe de France 2026</small></div>
       </div>
     </div>
   </section>
@@ -333,8 +343,8 @@
   <!-- ============================== ROBOTS ============================= -->
   <section id="robots">
     <div class="wrap">
-      <h2 class="titre">Nos <span>robots</span></h2>
-      <p class="sous-titre">Découvrez les machines conçues, fabriquées et programmées par l'équipe.</p>
+      <h2 class="titre" data-i18n="robots.title">Nos <span>robots</span></h2>
+      <p class="sous-titre" data-i18n="robots.subtitle">Découvrez les machines conçues, fabriquées et programmées par l'équipe.</p>
 
       <!-- CARROUSEL : les photos sont chargées automatiquement depuis le dossier
            ROBOT_PICTURE/. Pour en ajouter, dépose simplement tes images dedans. -->
@@ -345,7 +355,7 @@
       </div>
       <div class="dots" id="dots"></div>
       <div style="text-align:center; margin-top:2.2rem;">
-        <a class="btn btn-jaune" href="technique.html"><i class="fa-solid fa-cube"></i> Explorer nos robots en 3D — fiches techniques (règlement 2026)</a>
+        <a class="btn btn-jaune" href="technique.html"><i class="fa-solid fa-cube"></i> <span data-i18n="robots.techbtn">Explorer nos robots en 3D — fiches techniques (règlement 2026)</span></a>
       </div>
     </div>
   </section>
@@ -353,8 +363,8 @@
   <!-- ============================== BILANS ============================= -->
   <section id="bilans">
     <div class="wrap">
-      <h2 class="titre">Nos <span>bilans</span></h2>
-      <p class="sous-titre">Retour sur nos compétitions et les temps forts de la saison.</p>
+      <h2 class="titre" data-i18n="reports.title">Nos <span>bilans</span></h2>
+      <p class="sous-titre" data-i18n="reports.subtitle">Retour sur nos compétitions et les temps forts de la saison.</p>
 
       <!-- Carrousel : les bilans sont générés automatiquement depuis la liste
            en bas de page, du plus récent au plus ancien. -->
@@ -385,19 +395,19 @@
   <!-- ============================== VIDÉOS ============================= -->
   <section id="videos">
     <div class="wrap">
-      <h2 class="titre">Nos <span>matchs</span> en vidéo</h2>
-      <p class="sous-titre">Quelques temps forts de nos matchs en compétition.</p>
+      <h2 class="titre" data-i18n="videos.title">Nos <span>matchs</span> en vidéo</h2>
+      <p class="sous-titre" data-i18n="videos.subtitle">Quelques temps forts de nos matchs en compétition.</p>
 
       <!-- Pour intégrer une vidéo YouTube : remplace l'identifiant après /embed/
            par celui de ta vidéo (la partie après "v=" dans l'URL YouTube) -->
       <div class="videos">
         <figure>
           <div class="video-embed"><iframe src="https://www.youtube.com/embed/pMh3wY4uUH4" title="Série 5 — Opossum vs TDS-TEAM72" allowfullscreen loading="lazy"></iframe></div>
-          <figcaption>Série 5 vs TDS-TEAM72<span>Match de poule</span></figcaption>
+          <figcaption data-i18n="videos.cap1">Série 5 vs TDS-TEAM72<span>Match de poule</span></figcaption>
         </figure>
         <figure>
           <div class="video-embed"><iframe src="https://www.youtube.com/embed/gtVpHhMgYpY" title="8e de finale — Opossum vs Sudriabotik" allowfullscreen loading="lazy"></iframe></div>
-          <figcaption>8ᵉ de finale vs Sudriabotik<span>Phase finale</span></figcaption>
+          <figcaption data-i18n="videos.cap2">8ᵉ de finale vs Sudriabotik<span>Phase finale</span></figcaption>
         </figure>
       </div>
     </div>
@@ -406,8 +416,8 @@
   <!-- ============================= SPONSORS ============================ -->
   <section id="sponsors">
     <div class="wrap">
-      <h2 class="titre">Nos <span>partenaires</span></h2>
-      <p class="sous-titre">Merci à ceux qui soutiennent l'équipe et rendent nos projets possibles.</p>
+      <h2 class="titre" data-i18n="sponsors.title">Nos <span>partenaires</span></h2>
+      <p class="sous-titre" data-i18n="sponsors.subtitle">Merci à ceux qui soutiennent l'équipe et rendent nos projets possibles.</p>
 
       <!-- Logos : mets-les dans assets/img/sponsors/ puis remplace les liens/images -->
       <div class="sponsor-grid">
@@ -418,10 +428,10 @@
       </div>
 
       <div class="sponsor-cta">
-        <h3>Envie de nous soutenir ?</h3>
-        <p>Matériel, financement, savoir-faire : chaque coup de main compte. Rejoignez l'aventure Opossum et gagnez en visibilité auprès de la communauté robotique.</p>
-        <a class="btn btn-jaune" href="mailto:scrat.opossum@gmail.com?subject=Devenir%20sponsor%20de%20la%20Team%20Opossum"><i class="fa-solid fa-handshake"></i> Devenir sponsor</a>
-        <p class="sponsor-mail">ou écrivez-nous à <a href="mailto:scrat.opossum@gmail.com?subject=Devenir%20sponsor%20de%20la%20Team%20Opossum">scrat.opossum@gmail.com</a></p>
+        <h3 data-i18n="sponsors.ctaTitle">Envie de nous soutenir ?</h3>
+        <p data-i18n="sponsors.ctaText">Matériel, financement, savoir-faire : chaque coup de main compte. Rejoignez l'aventure Opossum et gagnez en visibilité auprès de la communauté robotique.</p>
+        <a class="btn btn-jaune" href="mailto:scrat.opossum@gmail.com?subject=Devenir%20sponsor%20de%20la%20Team%20Opossum"><i class="fa-solid fa-handshake"></i> <span data-i18n="sponsors.ctaBtn">Devenir sponsor</span></a>
+        <p class="sponsor-mail" data-i18n="sponsors.mail">ou écrivez-nous à <a href="mailto:scrat.opossum@gmail.com?subject=Devenir%20sponsor%20de%20la%20Team%20Opossum">scrat.opossum@gmail.com</a></p>
       </div>
     </div>
   </section>
@@ -434,8 +444,84 @@
       <a href="https://www.linkedin.com/company/team-opossum-robotique/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
       <a href="mailto:scrat.opossum@gmail.com" aria-label="E-mail"><i class="fa-solid fa-envelope"></i></a>
     </div>
-    <small>© 2026 Team Opossum — Équipe de robotique.</small>
+    <small data-i18n="footer.copy">© 2026 Team Opossum — Équipe de robotique.</small>
   </footer>
+
+  <!-- ==================== LANGUES (FR / EN) ==================== -->
+  <script>
+    const I18N = {
+      fr: {
+        'nav.home': `Accueil`, 'nav.about': `À propos`, 'nav.robots': `Robots`, 'nav.tech': `Technique`,
+        'nav.reports': `Bilans`, 'nav.videos': `Vidéos`, 'nav.sponsors': `Sponsors`, 'nav.contact': `Contact`,
+        'hero.tagline': `Équipe de robotique — Coupe de France de Robotique`,
+        'about.title': `À <span>propos</span>`,
+        'about.subtitle': `Une jeune équipe de passionnés de robotique.`,
+        'about.p1': `Fondée en <strong>2025</strong>, l'association <strong>Team Opossum</strong> réunit des passionnés autour d'un même objectif : concevoir, fabriquer et programmer des robots autonomes, puis les faire s'affronter sur le terrain.`,
+        'about.p2': `Notre grand rendez-vous chaque année, c'est la <strong>Coupe de France de Robotique</strong> — mais nous participons aussi à d'autres événements et rencontres autour de la robotique, pour apprendre, partager et repousser nos limites.`,
+        'about.stat1': `Coupe de France 2025`, 'about.stat2': `Coupe de France 2026`,
+        'robots.title': `Nos <span>robots</span>`,
+        'robots.subtitle': `Découvrez les machines conçues, fabriquées et programmées par l'équipe.`,
+        'robots.techbtn': `Explorer nos robots en 3D — fiches techniques (règlement 2026)`,
+        'reports.title': `Nos <span>bilans</span>`,
+        'reports.subtitle': `Retour sur nos compétitions et les temps forts de la saison.`,
+        'videos.title': `Nos <span>matchs</span> en vidéo`,
+        'videos.subtitle': `Quelques temps forts de nos matchs en compétition.`,
+        'videos.cap1': `Série 5 vs TDS-TEAM72<span>Match de poule</span>`,
+        'videos.cap2': `8ᵉ de finale vs Sudriabotik<span>Phase finale</span>`,
+        'sponsors.title': `Nos <span>partenaires</span>`,
+        'sponsors.subtitle': `Merci à ceux qui soutiennent l'équipe et rendent nos projets possibles.`,
+        'sponsors.ctaTitle': `Envie de nous soutenir ?`,
+        'sponsors.ctaText': `Matériel, financement, savoir-faire : chaque coup de main compte. Rejoignez l'aventure Opossum et gagnez en visibilité auprès de la communauté robotique.`,
+        'sponsors.ctaBtn': `Devenir sponsor`,
+        'sponsors.mail': `ou écrivez-nous à <a href="mailto:scrat.opossum@gmail.com?subject=Devenir%20sponsor%20de%20la%20Team%20Opossum">scrat.opossum@gmail.com</a>`,
+        'footer.copy': `© 2026 Team Opossum — Équipe de robotique.`,
+        'card.read': `Lire l'article`
+      },
+      en: {
+        'nav.home': `Home`, 'nav.about': `About`, 'nav.robots': `Robots`, 'nav.tech': `Technical`,
+        'nav.reports': `Reports`, 'nav.videos': `Videos`, 'nav.sponsors': `Sponsors`, 'nav.contact': `Contact`,
+        'hero.tagline': `Robotics team — French Robotics Cup`,
+        'about.title': `About <span>us</span>`,
+        'about.subtitle': `A young team of robotics enthusiasts.`,
+        'about.p1': `Founded in <strong>2025</strong>, the <strong>Team Opossum</strong> association brings together enthusiasts around one goal: to design, build and program autonomous robots, then pit them against each other on the field.`,
+        'about.p2': `Our biggest event every year is the <strong>French Robotics Cup</strong> — but we also take part in other robotics events and meet-ups, to learn, share and push our limits.`,
+        'about.stat1': `French Robotics Cup 2025`, 'about.stat2': `French Robotics Cup 2026`,
+        'robots.title': `Our <span>robots</span>`,
+        'robots.subtitle': `Discover the machines designed, built and programmed by the team.`,
+        'robots.techbtn': `Explore our robots in 3D — technical sheets (2026 rules)`,
+        'reports.title': `Our <span>reports</span>`,
+        'reports.subtitle': `A look back at our competitions and the season's highlights.`,
+        'videos.title': `Our <span>matches</span> on video`,
+        'videos.subtitle': `A few highlights from our competition matches.`,
+        'videos.cap1': `Round 5 vs TDS-TEAM72<span>Group stage</span>`,
+        'videos.cap2': `Round of 16 vs Sudriabotik<span>Knockout stage</span>`,
+        'sponsors.title': `Our <span>partners</span>`,
+        'sponsors.subtitle': `Thanks to those who support the team and make our projects possible.`,
+        'sponsors.ctaTitle': `Want to support us?`,
+        'sponsors.ctaText': `Equipment, funding, expertise: every bit of help counts. Join the Opossum adventure and gain visibility within the robotics community.`,
+        'sponsors.ctaBtn': `Become a sponsor`,
+        'sponsors.mail': `or email us at <a href="mailto:scrat.opossum@gmail.com?subject=Become%20a%20Team%20Opossum%20sponsor">scrat.opossum@gmail.com</a>`,
+        'footer.copy': `© 2026 Team Opossum — Robotics team.`,
+        'card.read': `Read the article`
+      }
+    };
+    let LANG = localStorage.getItem('lang') || (navigator.language || 'fr').slice(0, 2).toLowerCase();
+    if (LANG !== 'en') LANG = 'fr';
+    function T(key) { return (I18N[LANG] && I18N[LANG][key] != null) ? I18N[LANG][key] : (I18N.fr[key] != null ? I18N.fr[key] : ''); }
+    function applyStaticI18n() {
+      document.documentElement.lang = LANG;
+      document.querySelectorAll('[data-i18n]').forEach(el => { const v = T(el.getAttribute('data-i18n')); if (v) el.innerHTML = v; });
+      document.querySelectorAll('#lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+    }
+    function setLang(lang) {
+      LANG = (lang === 'en') ? 'en' : 'fr';
+      localStorage.setItem('lang', LANG);
+      applyStaticI18n();
+      document.dispatchEvent(new CustomEvent('langchange', { detail: LANG }));
+    }
+    document.querySelectorAll('#lang-switch button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+    applyStaticI18n();
+  </script>
 
   <script>
     /* --------- Menu mobile --------- */
@@ -566,7 +652,7 @@
       const prev  = document.getElementById('bilans-prev');
       const next  = document.getElementById('bilans-next');
       const modal = document.getElementById('article-modal');
-      const fmt = d => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      const fmt = d => new Date(d).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
       /* --- Lister les dossiers d'articles --- */
       async function listSlugs() {
@@ -616,6 +702,9 @@
         };
       }
       async function loadArticle(slug) {
+        if (LANG === 'en') {   /* version anglaise si elle existe (article.en.md) */
+          try { const re = await fetch(`${DIR}/${slug}/article.en.md`, { cache: 'no-cache' }); if (re.ok) return parseArticle(await re.text(), slug); } catch (e) { /* ignore */ }
+        }
         const r = await fetch(`${DIR}/${slug}/article.md`, { cache: 'no-cache' });
         if (!r.ok) throw new Error('404 ' + slug);
         return parseArticle(await r.text(), slug);
@@ -650,7 +739,7 @@
             <div class="date">${fmt(a.date)}</div>
             <h3>${a.titre}</h3>
             <p>${a.resume}</p>
-            <span class="lire">Lire l'article <i class="fa-solid fa-arrow-right"></i></span>
+            <span class="lire">${T('card.read')} <i class="fa-solid fa-arrow-right"></i></span>
           </div>`;
         el.addEventListener('click', () => openArticle(a));
         return el;
@@ -707,12 +796,14 @@
       window.addEventListener('resize', refresh);
       window.addEventListener('load', refresh);
 
-      /* --- Demarrage --- */
-      (async function init() {
+      /* --- Demarrage (rechargé aussi au changement de langue) --- */
+      async function loadBilans() {
+        grid.innerHTML = '';
         const slugs = await listSlugs();
         const results = await Promise.allSettled(slugs.map(loadArticle));
         const items = results.filter(r => r.status === 'fulfilled').map(r => r.value)
                              .sort((a, b) => new Date(b.date) - new Date(a.date));
+        grid.innerHTML = '';
         items.forEach(a => grid.appendChild(makeCard(a)));
         /* Copie texte des articles dans le bloc SEO invisible (référencement) */
         const seo = document.getElementById('seo-articles');
@@ -721,7 +812,9 @@
           seo.innerHTML = items.map(a => `<article><h2>${a.titre}</h2><p>${a.resume}</p><p>${strip(a.contenu)}</p></article>`).join('');
         }
         refresh();
-      })();
+      }
+      loadBilans();
+      document.addEventListener('langchange', loadBilans);
     })();
   </script>
 
