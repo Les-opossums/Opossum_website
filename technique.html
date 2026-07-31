@@ -111,6 +111,11 @@
     <div class="wrap">
       <h1>Fiche <span>technique</span></h1>
       <p class="sub">Explorez nos robots en 3D et découvrez chaque composant : cliquez sur les points du modèle ou sur les blocs du schéma.</p>
+      <p style="text-align:center; margin-top:0.7rem;">
+        <span style="display:inline-block; background:var(--fond-2); border:1px solid rgba(255,255,255,0.12); color:var(--jaune); font-size:0.8rem; font-weight:600; padding:0.35rem 0.95rem; border-radius:999px;">
+          <i class="fa-solid fa-trophy"></i> Robots conçus pour le règlement Coupe de France de Robotique 2026
+        </span>
+      </p>
       <div class="switch" id="switch">
         <button data-robot="robot" class="active">Robot principal</button>
         <button data-robot="pami">PAMI</button>
@@ -167,6 +172,7 @@
     const DATA = {
       robot: {
         model: 'assets/models/robot.glb',
+        orbit: '-40deg 70deg auto',              /* vue 3/4 face (ajuste le 1er angle si besoin) */
         composants: [
           { id: 'lidar', cat: 'Perception', nom: 'Lidar A2M12', icon: 'fa-solid fa-satellite-dish',
             desc: "Lidar 360° : portée jusqu'à ~12 m, environ 16 000 mesures par seconde à 10 Hz. Il assure l'évitement de l'adversaire et la localisation du robot par triangulation sur les balises fixes.",
@@ -200,16 +206,19 @@
       },
       pami: {
         model: 'assets/models/pami.glb',
+        orbit: '-140deg 72deg auto',            /* vue 3/4 face (ajuste le 1er angle si besoin) */
         composants: [
           { id: 'lidar-pami', cat: 'Perception', nom: 'Lidar LD06', icon: 'fa-solid fa-satellite-dish',
-            desc: "Localisation absolue sur les bordures de la table et évitement.",
-            repo: 'https://github.com/Les-opossums', pos: '0m 0.08m 0m' },
+            desc: "Localisation absolue sur les bordures de la table et évitement des obstacles.",
+            repo: '',
+            pos: '-0.005705401289243914m 0.029323593942832026m 0.016414065037096574m' },
           { id: 'pico', cat: 'Cerveau', nom: 'Raspberry Pi Pico 2W', icon: 'fa-solid fa-microchip',
-            desc: "Microcontrôleur qui pilote le PAMI (déplacement holonome, séquence de fin de match).",
-            repo: 'https://github.com/Les-opossums', pos: '0m 0.05m 0m' },
+            desc: "Cerveau du PAMI : il gère l'œil (affichage), la localisation par le lidar, l'évitement, la stratégie de match et un client TCP.",
+            repo: 'https://github.com/Les-opossums/SW_PAMI_2026',
+            pos: '-0.006006042863164868m 0.07265708986216m -0.048162855348893564m' },
           { id: 'roues-pami', cat: 'Actionneurs', nom: 'Base holonome 3 roues', icon: 'fa-solid fa-gears',
-            desc: "Trois roues omnidirectionnelles imprimées en 3D pour se déplacer librement.",
-            repo: 'https://github.com/Les-opossums', pos: '0m 0.01m 0.06m' }
+            desc: "Trois roues omnidirectionnelles imprimées en 3D pour se déplacer librement dans toutes les directions.",
+            repo: '', pos: '0m 0.01m 0.06m' }
         ]
       }
     };
@@ -239,6 +248,9 @@
       const d = DATA[robot];
       /* modèle 3D */
       viewer.src = d.model;
+      /* angle de vue de départ (3/4 face) */
+      if (d.orbit) viewer.setAttribute('camera-orbit', d.orbit);
+      else viewer.removeAttribute('camera-orbit');
       /* points cliquables (hotspots) sur le modèle */
       viewer.querySelectorAll('.hotspot').forEach(h => h.remove());
       d.composants.forEach((c, i) => {
