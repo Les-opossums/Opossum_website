@@ -563,7 +563,8 @@
 
     /* --------- Surlignage du lien de menu de la section active --------- */
     (function () {
-      const links = [...document.querySelectorAll('nav.menu a')];
+      /* uniquement les liens d'ancre (#...) : les liens de page (technique.html?lang=..) sont ignorés */
+      const links = [...document.querySelectorAll('nav.menu a')].filter(a => (a.getAttribute('href') || '').startsWith('#'));
       const secs = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
       if (!('IntersectionObserver' in window) || !secs.length) return;
       const io = new IntersectionObserver((entries) => {
