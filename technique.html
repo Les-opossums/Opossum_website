@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fiche technique — Team Opossum</title>
+  <meta name="description" content="Présentation technique des robots de la Team Opossum : modèle 3D interactif et architecture des composants." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Visionneuse 3D (modèle .glb manipulable) -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+
+  <style>
+    :root {
+      --jaune: #f5c518; --fond: #0e0f13; --fond-2: #171922;
+      --texte: #f2f3f5; --texte-doux: #a9adba; --radius: 14px; --max: 1100px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', system-ui, sans-serif; background: var(--fond); color: var(--texte); line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+
+    header {
+      position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 1.5rem; background: rgba(14,15,19,0.85); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .logo { font-weight: 800; letter-spacing: 0.04em; }
+    .logo span { color: var(--jaune); }
+    header a.back { color: var(--texte-doux); font-weight: 500; font-size: 0.95rem; }
+    header a.back:hover { color: var(--jaune); }
+
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; }
+    section { padding: 3.5rem 0; }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 800; text-align: center; }
+    h1 span { color: var(--jaune); }
+    .sub { text-align: center; color: var(--texte-doux); max-width: 640px; margin: 0.6rem auto 0; }
+    h2.titre { font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 800; margin-bottom: 0.4rem; }
+    h2.titre span { color: var(--jaune); }
+    .titre-sub { color: var(--texte-doux); margin-bottom: 1.8rem; }
+
+    /* Sélecteur robot / PAMI */
+    .switch { display: flex; gap: 0.6rem; justify-content: center; margin: 1.6rem 0 0; }
+    .switch button {
+      background: var(--fond-2); color: var(--texte); border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.6rem 1.4rem; border-radius: 999px; cursor: pointer; font-weight: 600; font-family: inherit;
+    }
+    .switch button.active { background: var(--jaune); color: #17130a; border-color: var(--jaune); }
+
+    /* Visionneuse 3D */
+    model-viewer {
+      width: 100%; height: 65vh; min-height: 380px; background: radial-gradient(circle at 50% 40%, #1c1f2a, #0e0f13 70%);
+      border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.06); --poster-color: transparent;
+    }
+    .viewer-note { text-align: center; color: var(--texte-doux); font-size: 0.85rem; margin-top: 0.7rem; }
+    /* Points cliquables sur le modèle 3D */
+    .hotspot {
+      width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: var(--jaune);
+      color: #17130a; font-weight: 800; font-size: 0.8rem; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: transform 0.15s;
+    }
+    .hotspot:hover { transform: scale(1.2); }
+
+    /* Schéma 2D : flux Perception -> Cerveau -> Actionneurs */
+    .schema { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; justify-content: center; }
+    .schema-col { background: var(--fond-2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 1.1rem; flex: 1 1 240px; min-width: 220px; }
+    .schema-col h3 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--jaune); margin-bottom: 0.9rem; text-align: center; }
+    .blk {
+      display: flex; align-items: center; gap: 0.7rem; width: 100%; text-align: left;
+      background: var(--fond); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+      padding: 0.8rem 0.9rem; margin-bottom: 0.7rem; cursor: pointer; color: var(--texte); font-family: inherit;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .blk:last-child { margin-bottom: 0; }
+    .blk:hover { border-color: var(--jaune); transform: translateY(-2px); }
+    .blk i { color: var(--jaune); font-size: 1.2rem; width: 1.4rem; text-align: center; }
+    .blk .blk-t { font-weight: 600; font-size: 0.95rem; }
+    .blk .blk-s { color: var(--texte-doux); font-size: 0.8rem; }
+    .schema-arrow { display: flex; align-items: center; color: var(--texte-doux); font-size: 1.5rem; }
+    @media (max-width: 760px) { .schema-arrow { transform: rotate(90deg); } }
+
+    /* Panneau détail composant */
+    .panel-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; visibility: hidden; transition: opacity 0.25s; }
+    .panel-modal.open { opacity: 1; visibility: visible; }
+    .panel-back { position: fixed; inset: 0; background: rgba(4,5,8,0.75); backdrop-filter: blur(3px); }
+    .panel-box { position: relative; width: min(520px, 100%); background: var(--fond-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.6rem 1.7rem 2rem; transform: scale(0.9); transition: transform 0.25s; }
+    .panel-modal.open .panel-box { transform: scale(1); }
+    .panel-box .cat { color: var(--jaune); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .panel-box h3 { font-size: 1.5rem; margin: 0.2rem 0 0.8rem; }
+    .panel-box p { color: #d6d9e0; margin-bottom: 1.2rem; }
+    .panel-box .btn-git { display: inline-flex; align-items: center; gap: 0.5rem; background: #24292e; color: #fff; padding: 0.7rem 1.3rem; border-radius: 999px; font-weight: 600; }
+    .panel-box .btn-git:hover { background: #000; }
+    .panel-close { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer; background: rgba(0,0,0,0.5); color: #fff; font-size: 1.1rem; }
+    .panel-close:hover { background: var(--jaune); color: #000; }
+
+    footer { text-align: center; padding: 2.5rem 1.5rem; color: var(--texte-doux); border-top: 1px solid rgba(255,255,255,0.06); }
+    body.no-scroll { overflow: hidden; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a class="logo" href="index.html">TEAM <span>OPOSSUM</span></a>
+    <a class="back" href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <h1>Fiche <span>technique</span></h1>
+      <p class="sub">Explorez nos robots en 3D et découvrez chaque composant : cliquez sur les points du modèle ou sur les blocs du schéma.</p>
+      <div class="switch" id="switch">
+        <button data-robot="robot" class="active">Robot principal</button>
+        <button data-robot="pami">PAMI</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= MODÈLE 3D ======================= -->
+  <section style="padding-top:0">
+    <div class="wrap">
+      <model-viewer id="viewer" camera-controls touch-action="pan-y" auto-rotate
+        shadow-intensity="1" exposure="1" ar
+        alt="Modèle 3D du robot">
+      </model-viewer>
+      <p class="viewer-note">Glissez pour tourner autour · molette/pincement pour zoomer · cliquez sur un point jaune pour les détails</p>
+      <div style="text-align:center; margin-top:0.5rem;">
+        <button id="place-btn" style="background:var(--fond-2); color:var(--texte-doux); border:1px dashed rgba(255,255,255,0.2); border-radius:999px; padding:0.4rem 1rem; cursor:pointer; font-family:inherit; font-size:0.82rem;">📍 Mode placement des points (dev)</button>
+        <code id="place-out" style="display:inline-block; margin-left:0.6rem; color:var(--jaune); font-size:0.82rem;"></code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= SCHÉMA 2D ======================= -->
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2 class="titre">Architecture <span>du robot</span></h2>
+      <p class="titre-sub">Cliquez sur un bloc pour sa fiche et le dépôt de code associé.</p>
+      <div class="schema" id="schema"></div>
+    </div>
+  </section>
+
+  <footer>© 2026 Team Opossum — Fiche technique</footer>
+
+  <!-- Panneau détail -->
+  <div class="panel-modal" id="panel">
+    <div class="panel-back" data-close></div>
+    <div class="panel-box" role="dialog" aria-modal="true">
+      <button class="panel-close" data-close aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+      <div class="cat" id="p-cat"></div>
+      <h3 id="p-nom"></h3>
+      <p id="p-desc"></p>
+      <a class="btn-git" id="p-git" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> Voir le dépôt Git</a>
+    </div>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!--  COMPOSANTS  —  Pour AJOUTER/MODIFIER un composant : édite la liste.  -->
+  <!--  cat   : catégorie (Perception / Cerveau / Actionneurs)              -->
+  <!--  icon  : icône Font Awesome                                          -->
+  <!--  repo  : lien du dépôt GitHub (laisse '' si aucun)                   -->
+  <!--  pos   : position du point sur le modèle 3D "x y z" (voir aide)      -->
+  <!-- ==================================================================== -->
+  <script>
+    const DATA = {
+      robot: {
+        model: 'assets/models/robot.glb',
+        composants: [
+          { id: 'lidar', cat: 'Perception', nom: 'Lidar A2M12', icon: 'fa-solid fa-satellite-dish',
+            desc: "Lidar utilisé pour l'évitement de l'adversaire et la localisation par triangulation sur les balises fixes.",
+            repo: 'https://github.com/Les-opossums', pos: '0m 0.30m 0m' },
+          { id: 'cameras', cat: 'Perception', nom: '3× caméras JeVois Pro', icon: 'fa-solid fa-camera',
+            desc: "Trois caméras intelligentes qui repèrent les éléments de jeu dans toutes les directions.",
+            repo: 'https://github.com/Les-opossums', pos: '0.10m 0.22m 0.10m' },
+          { id: 'rpi', cat: 'Cerveau', nom: 'Raspberry Pi 4', icon: 'fa-brands fa-raspberry-pi',
+            desc: "Calculateur haut niveau : stratégie de match dynamique qui s'adapte en temps réel.",
+            repo: 'https://github.com/Les-opossums', pos: '0m 0.15m 0m' },
+          { id: 'zynq', cat: 'Cerveau', nom: 'Zynq-7000', icon: 'fa-solid fa-microchip',
+            desc: "SoC FPGA dédié à l'asservissement des moteurs et à la gestion des actionneurs.",
+            repo: 'https://github.com/Les-opossums', pos: '0.05m 0.12m 0m' },
+          { id: 'moteurs', cat: 'Actionneurs', nom: '4× moteurs M2006 P36', icon: 'fa-solid fa-gears',
+            desc: "Base holonome à 4 roues, jusqu'à 1,5 m/s, déplacements dans toutes les directions.",
+            repo: 'https://github.com/Les-opossums', pos: '0m 0.02m 0.15m' },
+          { id: 'pinces', cat: 'Actionneurs', nom: '8 pinces à ventouse', icon: 'fa-solid fa-hand',
+            desc: "Huit pinces à ventouses pour attraper et retourner les « jenga » du règlement.",
+            repo: 'https://github.com/Les-opossums', pos: '0.15m 0.10m 0m' }
+        ]
+      },
+      pami: {
+        model: 'assets/models/pami.glb',
+        composants: [
+          { id: 'lidar-pami', cat: 'Perception', nom: 'Lidar LD06', icon: 'fa-solid fa-satellite-dish',
+            desc: "Localisation absolue sur les bordures de la table et évitement.",
+            repo: 'https://github.com/Les-opossums', pos: '0m 0.08m 0m' },
+          { id: 'pico', cat: 'Cerveau', nom: 'Raspberry Pi Pico 2W', icon: 'fa-solid fa-microchip',
+            desc: "Microcontrôleur qui pilote le PAMI (déplacement holonome, séquence de fin de match).",
+            repo: 'https://github.com/Les-opossums', pos: '0m 0.05m 0m' },
+          { id: 'roues-pami', cat: 'Actionneurs', nom: 'Base holonome 3 roues', icon: 'fa-solid fa-gears',
+            desc: "Trois roues omnidirectionnelles imprimées en 3D pour se déplacer librement.",
+            repo: 'https://github.com/Les-opossums', pos: '0m 0.01m 0.06m' }
+        ]
+      }
+    };
+
+    /* ---------- Rendu (inutile de modifier en dessous) ---------- */
+    const viewer = document.getElementById('viewer');
+    const schema = document.getElementById('schema');
+    const panel = document.getElementById('panel');
+    const CATS = ['Perception', 'Cerveau', 'Actionneurs'];
+    const ARROW = '<div class="schema-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>';
+
+    function openPanel(c) {
+      document.getElementById('p-cat').textContent = c.cat;
+      document.getElementById('p-nom').textContent = c.nom;
+      document.getElementById('p-desc').textContent = c.desc;
+      const git = document.getElementById('p-git');
+      if (c.repo) { git.href = c.repo; git.style.display = 'inline-flex'; }
+      else { git.style.display = 'none'; }
+      panel.classList.add('open');
+      document.body.classList.add('no-scroll');
+    }
+    function closePanel() { panel.classList.remove('open'); document.body.classList.remove('no-scroll'); }
+    panel.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closePanel));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+    function render(robot) {
+      const d = DATA[robot];
+      /* modèle 3D */
+      viewer.src = d.model;
+      /* points cliquables (hotspots) sur le modèle */
+      viewer.querySelectorAll('.hotspot').forEach(h => h.remove());
+      d.composants.forEach((c, i) => {
+        if (!c.pos) return;
+        const btn = document.createElement('button');
+        btn.className = 'hotspot';
+        btn.slot = 'hotspot-' + c.id;
+        btn.setAttribute('data-position', c.pos);
+        btn.setAttribute('data-normal', '0m 1m 0m');
+        btn.textContent = (i + 1);
+        btn.addEventListener('click', () => openPanel(c));
+        viewer.appendChild(btn);
+      });
+      /* schéma 2D en colonnes par catégorie */
+      schema.innerHTML = '';
+      CATS.forEach((cat, idx) => {
+        const list = d.composants.filter(c => c.cat === cat);
+        if (!list.length) return;
+        const col = document.createElement('div');
+        col.className = 'schema-col';
+        col.innerHTML = '<h3>' + cat + '</h3>';
+        list.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'blk';
+          b.innerHTML = `<i class="${c.icon}"></i><span><span class="blk-t">${c.nom}</span><br><span class="blk-s">${c.repo ? 'Fiche + dépôt Git' : 'Fiche'}</span></span>`;
+          b.addEventListener('click', () => openPanel(c));
+          col.appendChild(b);
+        });
+        schema.appendChild(col);
+        if (idx < CATS.length - 1) schema.insertAdjacentHTML('beforeend', ARROW);
+      });
+    }
+
+    /* sélecteur robot / pami */
+    document.getElementById('switch').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      document.querySelectorAll('#switch button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      render(b.dataset.robot);
+    });
+
+    /* --- Mode placement des points : clique sur le modèle pour récupérer la position à coller dans "pos" --- */
+    const placeBtn = document.getElementById('place-btn');
+    const placeOut = document.getElementById('place-out');
+    let placeMode = false;
+    placeBtn.addEventListener('click', () => {
+      placeMode = !placeMode;
+      placeBtn.textContent = placeMode ? '📍 ACTIF — clique une pièce du robot' : '📍 Mode placement des points (dev)';
+      viewer.style.cursor = placeMode ? 'crosshair' : '';
+      placeOut.textContent = '';
+    });
+    viewer.addEventListener('click', (e) => {
+      if (!placeMode) return;
+      const p = viewer.positionAndNormalFromPoint ? viewer.positionAndNormalFromPoint(e.clientX, e.clientY) : null;
+      if (p) {
+        const s = "pos: '" + p.position.toString() + "'";
+        placeOut.textContent = s + '  (copié)';
+        if (navigator.clipboard) navigator.clipboard.writeText(s).catch(() => {});
+      } else {
+        placeOut.textContent = '(vise bien une pièce du robot)';
+      }
+    });
+
+    render('robot');
+  </script>
+</body>
+</html>
