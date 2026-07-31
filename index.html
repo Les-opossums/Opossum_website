@@ -354,7 +354,7 @@
         <button class="car-btn next" id="next" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
       <div class="dots" id="dots"></div>
-      <div style="text-align:center; margin-top:2.2rem;">
+      <div id="explore3d" style="text-align:center; margin-top:2.2rem; scroll-margin-top:80px;">
         <a class="btn btn-jaune" href="technique.html"><i class="fa-solid fa-cube"></i> <span data-i18n="robots.techbtn">Explorer nos robots en 3D — fiches techniques (règlement 2026)</span></a>
       </div>
     </div>
@@ -505,13 +505,28 @@
         'card.read': `Read the article`
       }
     };
-    let LANG = localStorage.getItem('lang') || (navigator.language || 'fr').slice(0, 2).toLowerCase();
+    let LANG = new URLSearchParams(location.search).get('lang') || localStorage.getItem('lang') || (navigator.language || 'fr').slice(0, 2).toLowerCase();
     if (LANG !== 'en') LANG = 'fr';
+    localStorage.setItem('lang', LANG);
     function T(key) { return (I18N[LANG] && I18N[LANG][key] != null) ? I18N[LANG][key] : (I18N.fr[key] != null ? I18N.fr[key] : ''); }
+    /* Propage la langue dans les liens vers l'autre page (robuste en local file:// et en ligne) */
+    function withLang(href) {
+      const [path, hash] = href.split('#');
+      const [base, qs] = path.split('?');
+      const p = new URLSearchParams(qs || ''); p.set('lang', LANG);
+      return base + '?' + p.toString() + (hash ? '#' + hash : '');
+    }
+    function syncCrossLinks() {
+      document.querySelectorAll('a[href]').forEach(a => {
+        const h = a.getAttribute('href');
+        if (/^(index\.html|technique\.html)(\?|#|$)/.test(h)) a.setAttribute('href', withLang(h));
+      });
+    }
     function applyStaticI18n() {
       document.documentElement.lang = LANG;
       document.querySelectorAll('[data-i18n]').forEach(el => { const v = T(el.getAttribute('data-i18n')); if (v) el.innerHTML = v; });
       document.querySelectorAll('#lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+      syncCrossLinks();
     }
     function setLang(lang) {
       LANG = (lang === 'en') ? 'en' : 'fr';

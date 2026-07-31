@@ -113,7 +113,7 @@
         <button type="button" data-lang="fr">FR</button>
         <button type="button" data-lang="en">EN</button>
       </div>
-      <a class="back" href="index.html"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="tech.back">Retour au site</span></a>
+      <a class="back" href="index.html#explore3d"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="tech.back">Retour au site</span></a>
     </div>
   </header>
 
@@ -189,7 +189,7 @@
         'tech.title': `Technical <span>sheet</span>`,
         'tech.sub': `Explore our robots in 3D and discover every component: click the points on the model or the blocks in the diagram.`,
         'tech.badge': `<i class="fa-solid fa-trophy"></i> Robots designed for the 2026 French Robotics Cup rules`,
-        'tech.robotMain': `Main robot`, 'tech.pami': `PAMI`,
+        'tech.robotMain': `Main robot`, 'tech.pami': `SIMA`,
         'tech.viewerNote': `Drag to orbit · scroll/pinch to zoom · click a yellow point for details`,
         'tech.archTitle': `Robot <span>architecture</span>`,
         'tech.archSub': `Click a block for its sheet and the related code repository.`,
@@ -199,13 +199,28 @@
         'blk.full': `Sheet + Git repo`, 'blk.sheet': `Sheet`
       }
     };
-    let LANG = localStorage.getItem('lang') || (navigator.language || 'fr').slice(0, 2).toLowerCase();
+    let LANG = new URLSearchParams(location.search).get('lang') || localStorage.getItem('lang') || (navigator.language || 'fr').slice(0, 2).toLowerCase();
     if (LANG !== 'en') LANG = 'fr';
+    localStorage.setItem('lang', LANG);
     function T(key) { return (I18N[LANG] && I18N[LANG][key] != null) ? I18N[LANG][key] : (I18N.fr[key] != null ? I18N.fr[key] : ''); }
+    /* Propage la langue dans les liens vers l'autre page (robuste en local file:// et en ligne) */
+    function withLang(href) {
+      const [path, hash] = href.split('#');
+      const [base, qs] = path.split('?');
+      const p = new URLSearchParams(qs || ''); p.set('lang', LANG);
+      return base + '?' + p.toString() + (hash ? '#' + hash : '');
+    }
+    function syncCrossLinks() {
+      document.querySelectorAll('a[href]').forEach(a => {
+        const h = a.getAttribute('href');
+        if (/^(index\.html|technique\.html)(\?|#|$)/.test(h)) a.setAttribute('href', withLang(h));
+      });
+    }
     function applyStaticI18n() {
       document.documentElement.lang = LANG;
       document.querySelectorAll('[data-i18n]').forEach(el => { const v = T(el.getAttribute('data-i18n')); if (v) el.innerHTML = v; });
       document.querySelectorAll('#lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+      syncCrossLinks();
     }
     function setLang(lang) {
       LANG = (lang === 'en') ? 'en' : 'fr';
@@ -288,7 +303,7 @@
       'moteurs': { nomEn: '4× M2006 P36 motors', descEn: "Four M2006 P36 motors drive a 4-wheel holonomic base, up to 1.5 m/s. Holonomy lets the robot translate and rotate in any direction independently: smooth trajectories, fast repositioning and great agility against the opponent." },
       'pinces': { nomEn: '8 suction grippers', descEn: "Eight suction grippers to grab and flip the game's jenga pieces. A custom board drives the pumps and solenoid valves by emulating a Feetech bus, which greatly simplifies the wiring." },
       'lidar-pami': { nomEn: 'LD06 Lidar', descEn: "Absolute localization on the table borders and obstacle avoidance." },
-      'pico': { nomEn: 'Raspberry Pi Pico 2W', descEn: "The PAMI's brain: it drives the eye (display), lidar localization, avoidance, match strategy and a TCP client." },
+      'pico': { nomEn: 'Raspberry Pi Pico 2W', descEn: "The SIMA's brain: it drives the eye (display), lidar localization, avoidance, match strategy and a TCP client." },
       'roues-pami': { nomEn: '3-wheel holonomic base', descEn: "Three 3D-printed omnidirectional wheels to move freely in any direction." }
     };
     const cnom = c => (LANG === 'en' && TR[c.id] && TR[c.id].nomEn) ? TR[c.id].nomEn : c.nom;

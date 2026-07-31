@@ -7,7 +7,7 @@ This season, **Team Opossum** was lucky to be supported by the **DGA** (Directio
 
 Thanks to their support, we were able to equip our robots with quality hardware:
 
-- the **lidars** of our PAMIs, which let them locate themselves on the table and avoid opponents,
+- the **lidars** of our SIMAs, which let them locate themselves on the table and avoid opponents,
 - **2 JeVois Pro cameras** for the main robot, which let us locate the game elements in every direction for greater efficiency in matches,
 - the digital **servomotors** for the main robot's eight grippers,
 - as well as various mechanical parts (wheels, MakerBeam, etc.).
