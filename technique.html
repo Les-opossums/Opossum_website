@@ -170,22 +170,32 @@
         composants: [
           { id: 'lidar', cat: 'Perception', nom: 'Lidar A2M12', icon: 'fa-solid fa-satellite-dish',
             desc: "Lidar utilisé pour l'évitement de l'adversaire et la localisation par triangulation sur les balises fixes.",
-            repo: 'https://github.com/Les-opossums', pos: '0m 0.30m 0m' },
+            repo: 'https://github.com/Les-opossums',
+            pos: '-0.017359488023426187m 0.38766075189213134m -0.028040596659818395m' },
           { id: 'cameras', cat: 'Perception', nom: '3× caméras JeVois Pro', icon: 'fa-solid fa-camera',
             desc: "Trois caméras intelligentes qui repèrent les éléments de jeu dans toutes les directions.",
-            repo: 'https://github.com/Les-opossums', pos: '0.10m 0.22m 0.10m' },
+            repo: 'https://github.com/Les-opossums',
+            pos: [
+              '0.0012976540564503336m 0.29190883634180237m 0.09762071536188119m',
+              '-0.07793439092239424m 0.28915654960159726m -0.02448986519256828m',
+              '-0.025285858420689415m 0.3098647823735045m -0.0838721937928556m'
+            ] },
           { id: 'rpi', cat: 'Cerveau', nom: 'Raspberry Pi 4', icon: 'fa-brands fa-raspberry-pi',
             desc: "Calculateur haut niveau : stratégie de match dynamique qui s'adapte en temps réel.",
-            repo: 'https://github.com/Les-opossums', pos: '0m 0.15m 0m' },
+            repo: 'https://github.com/Les-opossums',
+            pos: '0.06298947334289562m 0.21285403129993438m 0.004977466864431457m' },
           { id: 'zynq', cat: 'Cerveau', nom: 'Zynq-7000', icon: 'fa-solid fa-microchip',
             desc: "SoC FPGA dédié à l'asservissement des moteurs et à la gestion des actionneurs.",
-            repo: 'https://github.com/Les-opossums', pos: '0.05m 0.12m 0m' },
+            repo: 'https://github.com/Les-opossums',
+            pos: '-0.052485398948192596m 0.16126308296607378m -0.003106963605519833m' },
           { id: 'moteurs', cat: 'Actionneurs', nom: '4× moteurs M2006 P36', icon: 'fa-solid fa-gears',
             desc: "Base holonome à 4 roues, jusqu'à 1,5 m/s, déplacements dans toutes les directions.",
-            repo: 'https://github.com/Les-opossums', pos: '0m 0.02m 0.15m' },
-          { id: 'pinces', cat: 'Actionneurs', nom: '8 pinces à ventouse', icon: 'fa-solid fa-hand',
-            desc: "Huit pinces à ventouses pour attraper et retourner les « jenga » du règlement.",
-            repo: 'https://github.com/Les-opossums', pos: '0.15m 0.10m 0m' }
+            repo: 'https://github.com/Les-opossums',
+            pos: '0.0634976810992094m 0.022805601017329202m -0.048914333117163526m' },
+          { id: 'pinces', cat: 'Actionneurs', nom: '8 pinces (servos Feetech)', icon: 'fa-solid fa-hand',
+            desc: "Huit pinces à ventouses, actionnées par des servomoteurs Feetech, pour attraper et retourner les « jenga » du règlement.",
+            repo: 'https://github.com/Les-opossums',
+            pos: '-0.1301072736619231m 0.14611532961293916m 0.057259789039257165m' }
         ]
       },
       pami: {
@@ -232,15 +242,17 @@
       /* points cliquables (hotspots) sur le modèle */
       viewer.querySelectorAll('.hotspot').forEach(h => h.remove());
       d.composants.forEach((c, i) => {
-        if (!c.pos) return;
-        const btn = document.createElement('button');
-        btn.className = 'hotspot';
-        btn.slot = 'hotspot-' + c.id;
-        btn.setAttribute('data-position', c.pos);
-        btn.setAttribute('data-normal', '0m 1m 0m');
-        btn.textContent = (i + 1);
-        btn.addEventListener('click', () => openPanel(c));
-        viewer.appendChild(btn);
+        const positions = Array.isArray(c.pos) ? c.pos : (c.pos ? [c.pos] : []);
+        positions.forEach((pos, k) => {
+          const btn = document.createElement('button');
+          btn.className = 'hotspot';
+          btn.slot = 'hotspot-' + c.id + '-' + k;
+          btn.setAttribute('data-position', pos);
+          btn.setAttribute('data-normal', '0m 1m 0m');
+          btn.textContent = (i + 1);
+          btn.addEventListener('click', () => openPanel(c));
+          viewer.appendChild(btn);
+        });
       });
       /* schéma 2D en colonnes par catégorie */
       schema.innerHTML = '';
